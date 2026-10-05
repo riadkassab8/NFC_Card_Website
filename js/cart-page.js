@@ -44,13 +44,13 @@ function renderCart() {
                 const image = getProductImage(item.productId, item.options) || product.defaultImage;
                 
                 return `
-                    <div style="display: flex; gap: 1.5rem; background: var(--surface); padding: 1.5rem; border-radius: var(--radius-lg); border: 1px solid var(--border); position: relative;">
+                    <div class="cart-item-card">
                         
-                        <div style="width: 120px; height: 120px; border-radius: var(--radius-md); overflow: hidden; background: var(--accent-soft); flex-shrink: 0;">
-                            <img src="${image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="cart-item-image">
+                            <img src="${image}" alt="${product.name}" onerror="this.src='assets/images/card-default.png'">
                         </div>
                         
-                        <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div class="cart-item-details">
                             <div>
                                 <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem;">${product.name}</h3>
                                 <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.5rem;">${price} ${product.currency}</div>
@@ -62,17 +62,17 @@ function renderCart() {
                                 ` : ''}
                             </div>
                             
-                            <div style="display: flex; align-items: center; justify-content: space-between;">
-                                <div style="display: flex; align-items: center; gap: 1rem;">
-                                    <button class="qty-btn" data-action="dec" data-index="${index}" style="width: 32px; height: 32px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); cursor: pointer;">−</button>
-                                    <span style="font-weight: 600; width: 20px; text-align: center;">${item.quantity}</span>
-                                    <button class="qty-btn" data-action="inc" data-index="${index}" style="width: 32px; height: 32px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border); cursor: pointer;">+</button>
+                            <div class="cart-item-actions">
+                                <div class="cart-qty-controls">
+                                    <button class="qty-btn" data-action="dec" data-index="${index}">−</button>
+                                    <span class="qty-display">${item.quantity}</span>
+                                    <button class="qty-btn" data-action="inc" data-index="${index}">+</button>
                                 </div>
-                                <button class="remove-btn" data-index="${index}" style="background: rgba(239, 68, 68, 0.1); color: #ef4444; border: none; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: var(--radius-sm); transition: background 0.2s;">
+                                <button class="remove-btn" data-index="${index}">
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                                     </svg>
-                                    <span style="font-weight: 600;">حذف</span>
+                                    <span>حذف</span>
                                 </button>
                             </div>
                         </div>

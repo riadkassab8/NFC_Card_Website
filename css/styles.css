@@ -1224,6 +1224,103 @@ button[onclick*="selectProduct"]:active {
     }
 }
 
+/* Cart Item Mobile Layout */
+.cart-item-card {
+    display: flex;
+    gap: 1.5rem;
+    background: var(--surface);
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    position: relative;
+    flex-direction: column;
+}
+@media (min-width: 640px) {
+    .cart-item-card {
+        flex-direction: row;
+    }
+}
+.cart-item-image {
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--accent-soft);
+    flex-shrink: 0;
+    align-self: center;
+}
+.cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+@media (min-width: 640px) {
+    .cart-item-image {
+        align-self: flex-start;
+    }
+}
+.cart-item-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.5rem;
+    text-align: center;
+}
+@media (min-width: 640px) {
+    .cart-item-details {
+        text-align: right;
+    }
+}
+.cart-item-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+@media (min-width: 640px) {
+    .cart-item-actions {
+        justify-content: space-between;
+    }
+}
+.cart-qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.cart-qty-controls .qty-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+}
+.cart-qty-controls .qty-display {
+    font-weight: 600;
+    width: 24px;
+    text-align: center;
+}
+.cart-item-card .remove-btn {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-sm);
+    transition: background 0.2s;
+    font-weight: 600;
+}
+
 /* Print styles */
 @media print {
     .navbar,
