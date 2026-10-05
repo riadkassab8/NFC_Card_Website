@@ -47,10 +47,10 @@ function renderProduct() {
         document.title = `K2rty — ${currentProduct.name}`;
         
         container.innerHTML = `
-            <div class="product-page-grid" style="display: grid; gap: 4rem; align-items: start; grid-template-columns: 1fr;">
+            <div class="product-page-grid" style="display: grid; gap: clamp(2rem, 5vw, 4rem); align-items: start; grid-template-columns: 1fr;">
                 <!-- Product Visual -->
-                <div style="position: sticky; top: 100px;">
-                    <div style="position: relative; height: 500px; border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-lg);">
+                <div class="product-visual-col">
+                    <div style="position: relative; width: 100%; aspect-ratio: 1/1; max-height: 500px; border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-lg);">
                         ${createProductVisual({ ...currentProduct, defaultImage: currentSelectedImage })}
                     </div>
                     ${renderGallery()}
