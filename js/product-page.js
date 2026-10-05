@@ -7,6 +7,7 @@ let currentProduct = null;
 let selectedOptions = {};
 let quantity = 1;
 let currentSelectedImage = null;
+let customName = '';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Get product ID from URL
@@ -142,6 +143,12 @@ function renderOptionsForm() {
                     `;
                 }).join('')}
             </div>
+            ${option.id === 'engraving' && selectedOptions['engraving'] === 'name' ? `
+                <div style="margin-top: 1rem; animation: fadeIn 0.3s ease;">
+                    <label style="display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--accent);">الاسم المطلوب طباعته:</label>
+                    <input type="text" id="customNameInput" value="${customName}" placeholder="اكتب الاسم هنا..." required style="width: 100%; padding: 0.875rem; border: 2px solid var(--accent); border-radius: var(--radius-md); font-family: var(--font-ar); font-size: 1rem; outline: none; background: var(--bg); color: var(--text);">
+                </div>
+            ` : ''}
         </div>
     `).join('');
 }
@@ -207,10 +214,24 @@ function attachEvents() {
         });
     }
     
+    // Custom name input logic
+    const customNameInput = document.getElementById('customNameInput');
+    if (customNameInput) {
+        customNameInput.addEventListener('input', (e) => {
+            customName = e.target.value;
+        });
+    }
+    
     // Add to cart
     document.getElementById('addToCartForm').addEventListener('submit', (e) => {
         e.preventDefault();
-        addToCart(currentProduct.id, quantity, selectedOptions);
+        
+        const finalOptions = { ...selectedOptions };
+        if (finalOptions['engraving'] === 'name') {
+            finalOptions['customName'] = customName;
+        }
+        
+        addToCart(currentProduct.id, quantity, finalOptions);
         showToast('تمت الإضافة إلى السلة بنجاح!');
         // Optional: redirect to cart or just update badge
     });
