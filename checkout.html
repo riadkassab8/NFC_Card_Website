@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K2rty — إتمام الطلب</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar" class="navbar">
+        <div class="container-custom">
+            <div class="nav-content">
+                <a href="index.html" class="nav-brand" style="text-decoration: none;">K2rty</a>
+                
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <a href="cart.html" style="text-decoration: none; color: var(--text-muted);">الرجوع للسلة</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section style="padding: 4rem 0; min-height: 70vh;">
+        <div class="container-custom" style="max-width: 800px;">
+            <div id="checkoutContainer">
+                <h1 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; text-align: center;">إتمام الطلب</h1>
+                <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">الخطوة الأخيرة، ادخل بياناتك عشان نوصلك طلبك.</p>
+                
+                <div style="background: var(--surface); padding: 2rem; border-radius: var(--radius-xl); border: 1px solid var(--border); box-shadow: var(--shadow-sm);">
+                    <form id="checkoutForm" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">الاسم الكامل *</label>
+                            <input type="text" id="custName" required placeholder="الاسم ثلاثي" style="width: 100%; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: var(--font-ar); font-size: 1rem;">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">رقم الهاتف (WhatsApp) *</label>
+                            <input type="tel" id="custPhone" required placeholder="01xxxxxxxxx" style="width: 100%; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: var(--font-ar); font-size: 1rem;">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">المدينة / المحافظة *</label>
+                            <input type="text" id="custCity" required placeholder="مثال: القاهرة" style="width: 100%; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: var(--font-ar); font-size: 1rem;">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">العنوان بالكامل *</label>
+                            <input type="text" id="custAddress" required placeholder="الشارع، رقم العمارة، الشقة" style="width: 100%; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: var(--font-ar); font-size: 1rem;">
+                        </div>
+                        
+                        <div>
+                            <label style="display: block; font-weight: 600; margin-bottom: 0.5rem;">ملاحظات (اختياري)</label>
+                            <textarea id="orderNotes" rows="3" placeholder="أي طلبات خاصة؟" style="width: 100%; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: var(--font-ar); font-size: 1rem; resize: vertical;"></textarea>
+                        </div>
+                        
+                        <div style="background: var(--accent-soft); padding: 1.5rem; border-radius: var(--radius-md); margin-top: 1rem;">
+                            <div style="display: flex; justify-content: space-between; font-weight: 700; font-size: 1.25rem;">
+                                <span>الإجمالي (بدون شحن):</span>
+                                <span id="checkoutTotal">0 جنيه</span>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" id="submitBtn" class="btn-primary btn-lg" style="width: 100%; font-size: 1.25rem; margin-top: 1rem;">
+                            تأكيد الطلب
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script type="module" src="js/checkout.js"></script>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/201098277229" target="_blank" class="whatsapp-float" title="تواصل معنا على واتساب">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+    </a>
+</body>
+</html>
