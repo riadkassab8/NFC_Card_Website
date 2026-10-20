@@ -248,12 +248,7 @@ export function getApiBaseUrl() {
     const local = localStorage.getItem("k2rty_api_base");
     if (local) return local.replace(/\/$/, "");
 
-    // If local dev server or host
-    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
-        return "http://localhost:3000/api";
-    }
-
-    // Default API host
+    // Live Backend API on Koyeb - single source of truth for all data and orders
     return "https://smart-card-qr-api.koyeb.app/api";
 }
 

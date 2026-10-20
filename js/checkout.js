@@ -1,6 +1,7 @@
 import { getCart, getCartTotal, clearCart } from './cart.js';
 import { createOrder, submitOrder } from './orderService.js';
-import { getCachedCms, fetchLiveCms } from './cms.js';
+import { getCachedCms, fetchLiveCms, getApiBaseUrl } from './cms.js';
+import { syncLiveProducts } from './products.js';
 
 const FALLBACK_FIELDS = [
     {
@@ -105,6 +106,10 @@ function showSwalAlert(icon, title, text) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await syncLiveProducts();
+    } catch (_) {}
+
     const cart = getCart();
     if (cart.length === 0) {
         window.location.href = 'cart.html';
@@ -387,8 +392,40 @@ async function handleFormSubmit(e) {
         });
     }
 
+    let receiptUrl = '';
+    const receiptInput = document.getElementById('receiptImage');
+    if (receiptInput && receiptInput.files && receiptInput.files.length > 0) {
+        if (window.Swal) {
+            window.Swal.update({
+                title: 'جاري رفع صورة الإيصال...',
+                html: '<p style="color:#64748b;font-size:0.95rem;">يرجى الانتظار ثوانٍ معدودة لرفع صورة الإيصال وتثبيتها في طلبك...</p>'
+            });
+        }
+        try {
+            const formData = new FormData();
+            formData.append('file', receiptInput.files[0]);
+            const uploadRes = await fetch(`${getApiBaseUrl()}/website/upload`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            if (uploadRes.ok) {
+                const uploadData = await uploadRes.json();
+                receiptUrl = uploadData.url || '';
+            } else {
+                console.warn('Receipt upload warning:', await uploadRes.text());
+            }
+        } catch (uploadErr) {
+            console.warn('Receipt upload network error:', uploadErr);
+        }
+    }
+
     try {
         const order = createOrder(customer, cart, finalNotes);
+        order.receiptUrl = receiptUrl;
+        order.paymentMethod = selectedPayment?.value || 'cod';
         const result = await submitOrder(order);
 
         if (result.success) {

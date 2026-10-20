@@ -1,7 +1,10 @@
 import { getCart, removeFromCart, updateQuantity, getCartTotal } from './cart.js';
-import { getProductById, calculatePrice, getProductImage, getOptionLabel } from './products.js';
+import { getProductById, calculatePrice, getProductImage, getOptionLabel, syncLiveProducts } from './products.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    try {
+        await syncLiveProducts();
+    } catch (_) {}
     renderCart();
 });
 

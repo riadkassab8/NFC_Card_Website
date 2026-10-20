@@ -79,7 +79,9 @@ export async function submitOrder(order) {
                     },
                     items: normalizedItems,
                     totalAmount: total > 0 ? total : 450,
-                    notes: order.notes || ""
+                    notes: order.notes || "",
+                    receiptUrl: order.receiptUrl || "",
+                    paymentMethod: order.paymentMethod || ""
                 })
             });
 
@@ -119,6 +121,18 @@ export async function submitOrder(order) {
         });
 
         message += `\n💰 *الإجمالي:* ${total > 0 ? total : 450} جنيه\n`;
+
+        if (order.paymentMethod) {
+            let pLabel = order.paymentMethod;
+            if (pLabel === 'vodafone_cash') pLabel = 'فودافون كاش';
+            else if (pLabel === 'instapay') pLabel = 'إنستا باي';
+            else if (pLabel === 'cod') pLabel = 'الدفع عند الاستلام';
+            message += `💳 *طريقة الدفع:* ${pLabel}\n`;
+        }
+
+        if (order.receiptUrl) {
+            message += `🧾 *صورة إيصال التحويل:* ${order.receiptUrl}\n`;
+        }
 
         if (order.notes) {
             message += `\n*ملاحظات إضافية:*\n${order.notes}\n`;

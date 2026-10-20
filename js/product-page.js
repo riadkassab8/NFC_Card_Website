@@ -1,4 +1,4 @@
-import { getProductById, getDefaultProduct, calculatePrice, getProductImage } from './products.js';
+import { getProductById, getDefaultProduct, calculatePrice, getProductImage, syncLiveProducts } from './products.js';
 import { addToCart } from './cart.js';
 import { createFeatureList } from './ui.js';
 
@@ -7,7 +7,12 @@ let selectedOptions = {};
 let quantity = 1;
 let currentSelectedImage = null;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Fetch live products from backend
+    try {
+        await syncLiveProducts();
+    } catch (_) {}
+
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id') || getDefaultProduct().id;
 
