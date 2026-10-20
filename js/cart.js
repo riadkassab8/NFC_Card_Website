@@ -47,6 +47,7 @@ export function updateQuantity(index, quantity) {
 export function getCartTotal() {
     const cart = getCart();
     return cart.reduce((total, item) => {
+        if (!getProductById(item.productId)) return total;
         const price = calculatePrice(item.productId, item.options);
         return total + (price * item.quantity);
     }, 0);

@@ -1,5 +1,5 @@
 // Order Builder - Creative Order Flow
-import { getProductById, calculatePrice, getProductImage, formatPrice, getPriceBreakdown } from './products.js';
+import { getProductById, getAllProducts, calculatePrice, getProductImage, formatPrice, getPriceBreakdown } from './products.js';
 import { createOrder, submitOrder, validateOrder, saveDraftOrder } from './orderService.js';
 import { showToast, setLoading, createSuccessMessage, createOrderSummary } from './ui.js';
 
@@ -90,9 +90,9 @@ function renderStep1() {
 }
 
 function renderProductOptions() {
-    const products = ['physical', 'card', 'stand'];
-    return products.map(productId => {
-        const product = getProductById(productId);
+    const products = getAllProducts();
+    return products.map(product => {
+        const productId = product.id;
         const isSelected = orderState.items.some(item => item.productId === productId);
         
         return `

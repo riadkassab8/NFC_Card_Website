@@ -3,486 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K2rty — المنتجات الذكية</title>
-    
-    <!-- Fonts -->
+    <title>K2rty — عالمك في لمسة واحدة</title>
+    <meta name="description" content="كوستر K2rty الذكي بتقنيتي NFC وQR. شارك بياناتك وروابطك بلمسة واحدة — بدون تطبيق.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Custom Styles -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Outfit:wght@500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
-    
-    <style>
-        body {
-            background-color: var(--surface);
-            overflow-x: hidden;
-        }
-
-        /* Zigzag Sections */
-        .zigzag-section {
-            padding: 8rem 0;
-            border-bottom: 1px solid var(--border);
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            min-height: 85vh;
-            transition: opacity 0.5s ease;
-        }
-
-        .bg-gray-soft {
-            background-color: var(--bg); /* #F8FAFC */
-        }
-        
-        .bg-white {
-            background-color: var(--surface); /* #FFFFFF */
-        }
-
-        .zigzag-container {
-            display: flex;
-            flex-direction: column-reverse;
-            align-items: center;
-            gap: 4rem;
-        }
-
-        @media (min-width: 992px) {
-            .zigzag-container {
-                flex-direction: row;
-                justify-content: space-between;
-                gap: 6rem;
-            }
-            .zigzag-container.reverse {
-                flex-direction: row-reverse;
-            }
-            .zigzag-content, .zigzag-image-wrapper {
-                flex: 1;
-            }
-        }
-
-        .zigzag-content {
-            max-width: 500px;
-        }
-
-        .z-title {
-            font-size: clamp(3rem, 6vw, 4.5rem);
-            font-weight: 900;
-            color: var(--text);
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-        }
-
-        .z-desc {
-            font-size: clamp(1.125rem, 2vw, 1.375rem);
-            color: var(--text-muted);
-            line-height: 1.6;
-            margin-bottom: 2.5rem;
-        }
-
-        .z-price {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .z-price span {
-            color: var(--text-muted);
-            font-size: 1.125rem;
-            font-weight: 500;
-        }
-
-        .z-actions {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .z-btn-primary {
-            background: var(--text);
-            color: var(--surface);
-            padding: 1rem 2.5rem;
-            border-radius: 3rem;
-            font-weight: 700;
-            font-size: 1.125rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.75rem;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-        }
-        
-        .z-btn-primary:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-        }
-
-        .z-btn-primary svg {
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .zigzag-image-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            perspective: 1200px; /* Essential for 3D effect */
-        }
-
-        .z-image {
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            object-fit: contain;
-            border-radius: 24px;
-            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
-            transition: filter 0.8s ease;
-            transform-origin: center center;
-            will-change: transform, filter;
-        }
-
-        /* Subtle animated background circle for images */
-        .img-bg-circle {
-            position: absolute;
-            width: 80%;
-            padding-bottom: 80%;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0) 70%);
-            z-index: -1;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            will-change: transform;
-        }
-
-        @keyframes fade-in-up {
-            0% { opacity: 0; transform: translateY(30px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Intro Header */
-        .intro-header {
-            padding: 8rem 2rem 4rem;
-            text-align: center;
-            background: var(--surface);
-        }
-        .intro-title {
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 800;
-            color: var(--text);
-            margin-bottom: 1rem;
-        }
-        .intro-subtitle {
-            color: var(--text-muted);
-            font-size: 1.25rem;
-        }
-    </style>
+    <link rel="prefetch" href="about.html">
+    <link rel="prefetch" href="product.html">
+    <link rel="prefetch" href="cart.html">
 </head>
 <body>
-    <!-- Navigation -->
-    <nav id="navbar" class="navbar" style="position: fixed; width: 100%;">
+    <nav class="navbar" id="navbar">
         <div class="container-custom">
             <div class="nav-content">
-                <a href="index.html" class="nav-brand" style="text-decoration: none; color: var(--text);">K2rty</a>
-                
+                <a href="index.html" class="nav-brand">K2rty</a>
                 <div class="nav-links" id="navLinks">
-                    <a href="how-it-works.html" class="nav-link">كيف تعمل</a>
+                    <a href="index.html" class="nav-link">الرئيسية</a>
                     <a href="about.html" class="nav-link">عن K2rty</a>
+                    <a href="cart.html" class="nav-link cart-link-mobile">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        السلة
+                    </a>
                 </div>
-                
-                <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="nav-actions">
+                    <a href="product.html?id=sticker" class="btn-primary nav-cta">اطلب الآن</a>
                     <button class="nav-toggle" id="navToggle" aria-label="القائمة">
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <span></span><span></span><span></span>
                     </button>
-                    <a href="cart.html" style="position: relative; text-decoration: none; color: var(--text); padding: 0.5rem; display: flex; align-items: center; justify-content: center;">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                        </svg>
-                        <span class="cart-badge" id="cartBadge" style="position: absolute; top: -5px; right: -5px; background: var(--text); color: var(--surface); width: 20px; height: 20px; border-radius: 50%; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; font-weight: bold; display: none;">0</span>
+                    <a href="cart.html" class="cart-link" aria-label="السلة">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                        <span class="cart-badge">0</span>
                     </a>
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Optional Intro (Can be removed if strictly sections) -->
-    <div class="intro-header">
-        <h1 class="intro-title">اكتشف تشكيلة K2rty</h1>
-        <p class="intro-subtitle">اربط عالمك المادي بالرقمي بأسلوب فخم.</p>
-    </div>
-
     <main>
-        <!-- Section 1: Card -->
-        <section class="zigzag-section bg-gray-soft" data-personality="precision">
-            <div class="container-custom zigzag-container">
-                <div class="zigzag-content">
-                    <h2 class="z-title">البطاقة الذكية</h2>
-                    <p class="z-desc">البديل العصري والاحترافي للكروت الشخصية الورقية. شارك تفاصيل الاتصال، الروابط، وموقعك الجغرافي بلمسة واحدة فقط. مصممة من أجود الخامات لتعكس قوة هويتك.</p>
-                    <div class="z-price">199 <span>جنيه مصري</span></div>
-                    <div class="z-actions">
-                        <a href="product.html?id=card" class="z-btn-primary">
-                            التفاصيل والطلب
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                        </a>
+        <section class="video-section">
+            <div class="container-custom">
+                <h2 class="video-title">شاهد كيف يعمل K2rty</h2>
+                <p class="video-subtitle">كوستر ذكي يجمع NFC وQR في تصميم واحد. لمسة واحدة وصلت.</p>
+                <div class="video-container">
+                    <video autoplay muted loop playsinline>
+                        <source src="assets/images/New images/WhatsApp Video 2026-10-18 at 7.38.59 PM.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <p class="video-caption">قرّب الهاتف — صفحتك تفتح فوراً بدون تطبيق</p>
+            </div>
+        </section>
+
+        <section class="hero">
+            <div class="container-custom hero-grid">
+                <div>
+                    <div class="eyebrow">YOUR WORLD IN ONE TAP</div>
+                    <h1 class="hero-title">عالمك كله<br>في لمسة واحدة.</h1>
+                    <p class="hero-copy">كوستر K2rty الذكي يجمع NFC وQR في تصميم واحد. ثبّته، اربطه بروابطك، وشارك بياناتك أو صفحتك أو تقييم محلك في ثانية — بدون تطبيق.</p>
+                    <div class="hero-cta">
+                        <a href="product.html?id=sticker" class="btn-primary btn-lg">اطلب الكوستر</a>
+                        <a href="#how" class="btn-secondary btn-lg">شاهد كيف يعمل</a>
+                    </div>
+                    <div class="hero-meta">
+                        <div><strong>450 جنيه</strong>شامل اختيار اللون</div>
+                        <div><strong>Scan · Connect · Support</strong>NFC وQR معًا</div>
                     </div>
                 </div>
-                <div class="zigzag-image-wrapper" style="width: 100%;">
-                    <div class="img-bg-circle"></div>
-                    <img src="assets/images/card-default.png" alt="البطاقة الذكية" class="z-image">
+                <div class="hero-stage">
+                    <div class="hero-glow"></div>
+                    <div class="hero-card">
+                        <img id="heroImage" src="assets/images/product/sticker-white.png" alt="كوستر K2rty الذكي">
+                    </div>
+                    <div class="swatches" role="tablist" aria-label="ألوان المنتج">
+                        <button class="swatch is-active" data-color="white" data-src="assets/images/product/sticker-white.png" title="أبيض"></button>
+                        <button class="swatch" data-color="black" data-src="assets/images/product/sticker-black.png" title="أسود"></button>
+                        <button class="swatch" data-color="sage" data-src="assets/images/product/sticker-sage.jpg" title="زيتي"></button>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 2: Stand -->
-        <section class="zigzag-section bg-white" data-personality="physical">
-            <div class="container-custom zigzag-container reverse">
-                <div class="zigzag-content">
-                    <h2 class="z-title">الاستاند الذكي</h2>
-                    <p class="z-desc">الواجهة المثالية لعملك التجاري. يمكنك وضعه في الكافيه، المطعم، أو المكتب لجمع التقييمات وعرض الروابط بلمسة هاتف ذكية وسريعة. تصميم ثابت وجذاب.</p>
-                    <div class="z-price">399 <span>جنيه مصري</span></div>
-                    <div class="z-actions">
-                        <a href="product.html?id=stand" class="z-btn-primary">
-                            التفاصيل والطلب
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                        </a>
+        <section>
+            <div class="container-custom">
+                <div class="trust-bar">
+                    <div class="trust-item">
+                        <h3>NFC فوري</h3>
+                        <p>قرّب الهاتف — تفتح صفحتك مباشرة بدون تعقيد.</p>
                     </div>
-                </div>
-                <div class="zigzag-image-wrapper" style="width: 100%;">
-                    <div class="img-bg-circle"></div>
-                    <img src="assets/images/stand-default.png" alt="الاستاند الذكي" class="z-image">
+                    <div class="trust-item">
+                        <h3>QR احتياطي</h3>
+                        <p>أي كاميرا تقدر تمسح الكود لو NFC مش متاح.</p>
+                    </div>
+                    <div class="trust-item">
+                        <h3>بدون تطبيق</h3>
+                        <p>العميل مش محتاج ينزّل حاجة. التجربة تبدأ فورًا.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 3: Keychain -->
-        <section class="zigzag-section bg-gray-soft" data-personality="lightweight">
-            <div class="container-custom zigzag-container">
-                <div class="zigzag-content">
-                    <h2 class="z-title">الميدالية الذكية</h2>
-                    <p class="z-desc">اجعل هويتك الرقمية دائماً في متناول يدك مع ميدالية المفاتيح الذكية. قوية، خفيفة الوزن، وأنيقة، جاهزة لمشاركة بياناتك في أي وقت وفي كل مكان تتواجد فيه.</p>
-                    <div class="z-price">299 <span>جنيه مصري</span></div>
-                    <div class="z-actions">
-                        <a href="product.html?id=physical" class="z-btn-primary">
-                            التفاصيل والطلب
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M19 12H5M12 19l-7-7 7-7"/>
-                            </svg>
-                        </a>
+        <section class="why-section">
+            <div class="container-custom">
+                <h2 class="section-title">لماذا K2rty؟</h2>
+                <p class="section-lead">كوستر واحد يجمع كل ما تحتاجه في تصميم أنيق.</p>
+                <div class="why-grid">
+                    <div class="why-card">
+                        <div class="why-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+                        </div>
+                        <h3>NFC فوري</h3>
+                        <p>قرّب الهاتف وصفحتك تفتح فوراً. بدون تطبيق، بدون تعقيد، تجربة سلسة من أول لمسة.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="5" x2="12" y2="5"></line></svg>
+                        </div>
+                        <h3>QR احتياطي</h3>
+                        <p>لو NFC مش متاح، أي كاميرا تقدر تمسح الكود. دائماً عندك خيار ثاني للوصول.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <h3>بدون تطبيق</h3>
+                        <p>العميل مش محتاج ينزّل أي حاجة. التجربة تبدأ فوراً من أي هاتف تقريباً.</p>
+                    </div>
+                    <div class="why-card">
+                        <div class="why-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg>
+                        </div>
+                        <h3>تصميم أنيق</h3>
+                        <p>ثلاث ألوان تناسب أي هوية. أبيض نظيف، أسود فخم، أو زيتي دافئ.</p>
                     </div>
                 </div>
-                <div class="zigzag-image-wrapper" style="width: 100%;">
-                    <div class="img-bg-circle"></div>
-                    <img src="assets/images/physical-default.png" alt="الميدالية الذكية" class="z-image">
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container-custom">
+                <h2 class="section-title">لشغلك. لمحلك. لنفسك.</h2>
+                <p class="section-lead">قطعة واحدة تعمل في أكتر من سياق.</p>
+                <div class="uses">
+                    <article class="use-card">
+                        <h3>للمحترفين</h3>
+                        <p>بديل أنظف من الكارت الورقي. شارك رقمك، لينكدإن، وأعمالك بلمسة.</p>
+                    </article>
+                    <article class="use-card">
+                        <h3>للمحلات</h3>
+                        <p>خلّي العميل يفتح المنيو، يطلب، أو يسيب تقييم بدون ما يسأل.</p>
+                    </article>
+                    <article class="use-card">
+                        <h3>للدعم السريع</h3>
+                        <p>وصّل الناس لواتساب أو صفحة المساعدة فورًا. Scan · Connect · Support.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="container-custom">
+                <div class="cta-band">
+                    <h2 class="section-title">جاهز تخلي أول انطباع أذكى؟</h2>
+                    <p>كوستر واحد. ثلاث ألوان. وتقنية تشتغل من أول لمسة.</p>
+                    <a href="product.html?id=sticker" class="btn-primary btn-lg">اطلب K2rty</a>
                 </div>
             </div>
         </section>
     </main>
 
-            <!-- Footer -->
-    <footer class="footer">
-        <div class="container-custom">
-            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 3rem;">
-                <div class="footer-logo" style="font-family: var(--font-en); font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 1rem; letter-spacing: -0.05em; display: inline-block;">K2rty</div>
-                <p style="color: #a1a1aa; font-size: 1.125rem; line-height: 1.6; max-width: 400px; margin-bottom: 1.5rem;">نقدم لك مستقبل التواصل. اجعل كل تفاعلاتك أذكى وأسرع مع منتجاتنا المبتكرة.</p>
+    <nav class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <a href="index.html" class="bottom-nav-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span>الرئيسية</span>
+            </a>
+            <a href="about.html" class="bottom-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                <span>عن K2rty</span>
+            </a>
+            <a href="cart.html" class="bottom-nav-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+                <span>السلة</span>
+            </a>
+        </div>
+    </nav>
 
+    <footer class="footer">
+        <div class="container-custom footer-inner">
+            <div class="footer-logo">K2rty</div>
+            <p>Your world in one tap.</p>
+            <div class="footer-links">
+                <a class="footer-link" href="index.html">الرئيسية</a>
+                <a class="footer-link" href="product.html?id=sticker">اطلب الآن</a>
+                <a class="footer-link" href="about.html">من نحن</a>
             </div>
-            
-            <div style="display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 3rem;">
-                <a href="index.html" class="footer-link">الرئيسية</a>
-                <a href="product.html?id=physical" class="footer-link">ميداليا ذكية</a>
-                <a href="product.html?id=card" class="footer-link">بطاقة أعمال</a>
-                <a href="product.html?id=stand" class="footer-link">استاند العرض</a>
-                <a href="index.html#how-it-works" class="footer-link">كيف تعمل</a>
-                <a href="about.html" class="footer-link">من نحن</a>
-            </div>
-            
             <div class="footer-bottom">
-                <p>&copy; 2026 K2rty. جميع الحقوق محفوظة.</p>
-                <div style="display: flex; gap: 1rem;">
-                    <a href="#" style="color: inherit; text-decoration: none;">الشروط والأحكام</a>
-                    <a href="#" style="color: inherit; text-decoration: none;">سياسة الخصوصية</a>
-                </div>
+                <p>© 2026 K2rty. جميع الحقوق محفوظة.</p>
             </div>
         </div>
     </footer>
 
-    <!-- GSAP & ScrollTrigger -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-
-    <!-- UI JS (Runs without CORS) -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (typeof gsap !== 'undefined') {
-                gsap.registerPlugin(ScrollTrigger);
-
-                // Intro Animation
-                gsap.from(".intro-title", { y: 50, opacity: 0, duration: 1.5, ease: "power3.out" });
-                gsap.from(".intro-subtitle", { y: 50, opacity: 0, duration: 1.5, delay: 0.2, ease: "power3.out" });
-
-                // Section Animations
-                gsap.utils.toArray('.zigzag-section').forEach(section => {
-                    gsap.from(section, {
-                        scrollTrigger: {
-                            trigger: section,
-                            start: "top 80%", 
-                            once: true
-                        },
-                        y: 80,
-                        opacity: 0,
-                        duration: 1.5,
-                        ease: "power3.out"
-                    });
-                });
-            }
-
-            try { initProductMorph(); } catch(e) { console.error('Error in initProductMorph:', e); }
-        });
-
-        function initProductMorph() {
-            // Removed strict matchMedia checks because they can disable the feature on Windows machines with "Show animations" turned off.
-            const wrappers = document.querySelectorAll('.zigzag-image-wrapper');
-            if (wrappers.length === 0) return;
-            const lerp = (start, end, factor) => start + (end - start) * factor;
-
-            wrappers.forEach((wrapper) => {
-                const image = wrapper.querySelector('.z-image');
-                const spotlight = wrapper.querySelector('.img-bg-circle');
-                const section = wrapper.closest('.zigzag-section');
-                const personality = section.dataset.personality || 'precision';
-                
-                let config = {
-                    lerpFactor: 0.08,
-                    maxRotX: 2, 
-                    maxRotY: 3,
-                    maxTransX: 4, 
-                    maxTransY: 4,
-                    scale: 1.03,
-                    shadowShiftX: 10,
-                    shadowShiftY: 10
-                };
-
-                if (personality === 'physical') {
-                    config = { ...config, lerpFactor: 0.05, maxRotX: 4, maxRotY: 5, maxTransX: 5, scale: 1.04, shadowShiftX: 15, shadowShiftY: 15 };
-                } else if (personality === 'lightweight') {
-                    config = { ...config, lerpFactor: 0.1, maxRotX: 3, maxRotY: 4, maxTransX: 6, scale: 1.02, shadowShiftX: 8, shadowShiftY: 8 };
-                }
-
-                let isHovered = false;
-                let bounds = wrapper.getBoundingClientRect();
-                let mouseX = 0, mouseY = 0;
-                
-                let current = { rotX: 0, rotY: 0, transX: 0, transY: 0, scale: 1, shadowX: 0, shadowY: 0, brightness: 1 };
-                let target = { rotX: 0, rotY: 0, transX: 0, transY: 0, scale: 1, shadowX: 0, shadowY: 0, brightness: 1 };
-                
-                let sweepTimeout;
-
-                const updateBounds = () => { bounds = wrapper.getBoundingClientRect(); };
-                window.addEventListener('scroll', updateBounds, { passive: true });
-                window.addEventListener('resize', updateBounds, { passive: true });
-
-                wrapper.addEventListener('pointerenter', () => {
-                    isHovered = true;
-                    updateBounds();
-                    target.scale = config.scale;
-                    
-                    target.brightness = 1.15;
-                    clearTimeout(sweepTimeout);
-                    sweepTimeout = setTimeout(() => {
-                        if (isHovered) target.brightness = 1;
-                    }, 400); 
-                    
-                    spotlight.style.opacity = '0.8';
-                });
-
-                wrapper.addEventListener('pointerleave', () => {
-                    isHovered = false;
-                    target = { rotX: 0, rotY: 0, transX: 0, transY: 0, scale: 1, shadowX: 0, shadowY: 0, brightness: 1 };
-                    spotlight.style.opacity = '1';
-                    clearTimeout(sweepTimeout);
-                    spotlight.style.background = `radial-gradient(circle, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0) 70%)`;
-                });
-
-                wrapper.addEventListener('pointermove', (e) => {
-                    if (!isHovered) return;
-                    mouseX = ((e.clientX - bounds.left) / bounds.width) * 2 - 1;
-                    mouseY = ((e.clientY - bounds.top) / bounds.height) * 2 - 1;
-
-                    target.rotX = -mouseY * config.maxRotX; 
-                    target.rotY = mouseX * config.maxRotY;
-                    target.transX = mouseX * config.maxTransX;
-                    target.transY = mouseY * config.maxTransY;
-                    
-                    target.shadowX = -mouseX * config.shadowShiftX;
-                    target.shadowY = -mouseY * config.shadowShiftY;
-                    
-                    const lightX = ((mouseX + 1) / 2) * 100;
-                    const lightY = ((mouseY + 1) / 2) * 100;
-                    spotlight.style.background = `radial-gradient(circle at ${lightX}% ${lightY}%, rgba(255, 255, 255, 0.4) 0%, transparent 45%)`;
-                });
-
-                const render = () => {
-                    current.rotX = lerp(current.rotX, target.rotX, config.lerpFactor);
-                    current.rotY = lerp(current.rotY, target.rotY, config.lerpFactor);
-                    current.transX = lerp(current.transX, target.transX, config.lerpFactor);
-                    current.transY = lerp(current.transY, target.transY, config.lerpFactor);
-                    current.scale = lerp(current.scale, target.scale, config.lerpFactor);
-                    current.shadowX = lerp(current.shadowX, target.shadowX, config.lerpFactor);
-                    current.shadowY = lerp(current.shadowY, target.shadowY, config.lerpFactor);
-                    current.brightness = lerp(current.brightness, target.brightness, config.lerpFactor * 1.5); 
-
-                    if (Math.abs(current.scale - target.scale) > 0.001 || Math.abs(current.rotX - target.rotX) > 0.01 || Math.abs(current.brightness - target.brightness) > 0.01) {
-                        image.style.transform = `rotateX(${current.rotX}deg) rotateY(${current.rotY}deg) translate3d(${current.transX}px, ${current.transY}px, 0) scale(${current.scale})`;
-                        
-                        const shadow = `drop-shadow(${current.shadowX}px ${current.shadowY + 20}px 30px rgba(0,0,0,0.12))`;
-                        image.style.filter = `${shadow} brightness(${current.brightness})`;
-                    }
-                    requestAnimationFrame(render);
-                };
-                render();
-            });
-        }
-    </script>
-
-    <!-- App JS (Cart Modules - Requires Server) -->
-    <script type="module">
-        import { updateCartBadge } from './js/cart.js';
-        document.addEventListener('DOMContentLoaded', () => {
-            try { updateCartBadge(); } catch(e) { console.error('Cart Module Error:', e); }
-        });
-    </script>
-
-    <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/201098277229" target="_blank" class="whatsapp-float" title="تواصل معنا على واتساب">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+    <a href="https://wa.me/201098277229" target="_blank" class="whatsapp-float" title="واتساب">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
     </a>
 
-    <!-- Mobile Menu Script -->
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const toggle = document.getElementById('navToggle');
-            const links = document.getElementById('navLinks');
-            if (toggle && links) {
-                toggle.addEventListener('click', () => {
-                    links.classList.toggle('active');
-                });
-            }
+        const toggle = document.getElementById('navToggle');
+        const links = document.getElementById('navLinks');
+        toggle?.addEventListener('click', () => links.classList.toggle('active'));
+
+        const heroImage = document.getElementById('heroImage');
+        document.querySelectorAll('.swatch').forEach(swatch => {
+            swatch.addEventListener('click', () => {
+                document.querySelectorAll('.swatch').forEach(s => s.classList.remove('is-active'));
+                swatch.classList.add('is-active');
+                heroImage.src = swatch.dataset.src;
+            });
         });
+    </script>
+    <script type="module">
+        import { updateCartBadge } from './js/cart.js';
+        document.addEventListener('DOMContentLoaded', updateCartBadge);
     </script>
 </body>
 </html>

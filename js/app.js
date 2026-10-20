@@ -12,7 +12,7 @@ import {
 } from './ui.js';
 
 // State
-let currentProduct = 'physical';
+let currentProduct = 'sticker';
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', () => {

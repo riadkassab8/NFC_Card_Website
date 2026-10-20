@@ -46,38 +46,52 @@ export function createOrder(customer, items, notes = "") {
 }
 
 // Submit order
-// TODO: Replace with actual API call to Dashboard
-// Example: POST /api/orders
 export async function submitOrder(order) {
     try {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 800));
+        // Calculate total
+        let total = 0;
+        order.items.forEach(item => {
+            // Very basic total calc for the message, or we can just pass the total from the cart
+            total += item.price ? (item.price * item.quantity) : 0; 
+        });
+
+        // Build WhatsApp Message
+        let message = `*طلب جديد من موقع K2rty* 🛒\n\n`;
+        message += `*بيانات العميل:*\n`;
+        message += `👤 الاسم: ${order.customer.name}\n`;
+        message += `📱 رقم الهاتف: ${order.customer.phone}\n`;
+        message += `📍 المدينة: ${order.customer.city}\n`;
+        message += `🏠 العنوان: ${order.customer.address}\n\n`;
         
-        // TEMPORARY: Save to localStorage
-        // This will be replaced with actual API call
-        const orders = getLocalOrders();
-        orders.push(order);
-        localStorage.setItem('k2rty_orders', JSON.stringify(orders));
+        message += `*تفاصيل الطلب:*\n`;
+        order.items.forEach((item, index) => {
+            message += `${index + 1}. ${item.productName} (الكمية: ${item.quantity})\n`;
+            if (item.options) {
+                Object.entries(item.options).forEach(([key, val]) => {
+                    message += `   - ${key === 'customName' ? 'الاسم المخصص' : key}: ${val}\n`;
+                });
+            }
+        });
         
-        // FUTURE API IMPLEMENTATION:
-        // const response = await fetch('/api/orders', {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify(order)
-        // });
-        // 
-        // if (!response.ok) {
-        //     throw new Error('Failed to submit order');
-        // }
-        // 
-        // return await response.json();
+        if (order.notes) {
+            message += `\n*ملاحظات إضافية:*\n${order.notes}\n`;
+        }
+        
+        // WhatsApp number
+        const phoneNumber = "201098277229";
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+        
+        // Open WhatsApp in same tab or new tab
+        window.open(whatsappUrl, '_blank');
+        
+        // Clear draft and return success
+        clearDraftOrder();
         
         return {
             success: true,
             orderId: order.id,
-            message: "Order submitted successfully"
+            message: "تم توجيهك للواتساب"
         };
         
     } catch (error) {
