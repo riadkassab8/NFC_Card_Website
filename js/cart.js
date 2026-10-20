@@ -1,8 +1,21 @@
 import { getProductById, calculatePrice } from './products.js';
 
 export function getCart() {
-    const cart = localStorage.getItem('k2rty_cart');
-    return cart ? JSON.parse(cart) : [];
+    const cartStr = localStorage.getItem('k2rty_cart');
+    if (!cartStr) return [];
+    try {
+        const cart = JSON.parse(cartStr);
+        return cart.map(item => {
+            if (!item.price || !item.productName) {
+                const prod = getProductById(item.productId);
+                item.price = calculatePrice(item.productId, item.options);
+                item.productName = prod ? prod.name : 'كوستر K2rty الذكي';
+            }
+            return item;
+        });
+    } catch {
+        return [];
+    }
 }
 
 export function saveCart(cart) {
@@ -12,6 +25,8 @@ export function saveCart(cart) {
 
 export function addToCart(productId, quantity, options) {
     const cart = getCart();
+    const product = getProductById(productId);
+    const price = calculatePrice(productId, options);
     
     // Check if same product + options exists
     const optionsString = JSON.stringify(options);
@@ -19,9 +34,13 @@ export function addToCart(productId, quantity, options) {
     
     if (existingIndex >= 0) {
         cart[existingIndex].quantity += quantity;
+        cart[existingIndex].price = price;
+        cart[existingIndex].productName = product ? product.name : 'كوستر K2rty الذكي';
     } else {
         cart.push({
             productId,
+            productName: product ? product.name : 'كوستر K2rty الذكي',
+            price,
             quantity,
             options
         });
@@ -47,8 +66,7 @@ export function updateQuantity(index, quantity) {
 export function getCartTotal() {
     const cart = getCart();
     return cart.reduce((total, item) => {
-        if (!getProductById(item.productId)) return total;
-        const price = calculatePrice(item.productId, item.options);
+        const price = item.price || calculatePrice(item.productId, item.options);
         return total + (price * item.quantity);
     }, 0);
 }

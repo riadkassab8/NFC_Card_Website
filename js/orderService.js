@@ -3,6 +3,7 @@
 // Opens WhatsApp with order summary for customer confirmation
 
 import { getApiBaseUrl, getCachedCms } from './cms.js';
+import { getProductById, calculatePrice } from './products.js';
 
 function generateOrderId() {
     const timestamp = Date.now();
@@ -12,10 +13,24 @@ function generateOrderId() {
 
 // Create order object
 export function createOrder(customer, items, notes = "") {
+    const normalizedItems = (items || []).map(it => {
+        const prodId = it.productId || it.id || "sticker";
+        const prod = getProductById(prodId);
+        const calculatedPrice = calculatePrice(prodId, it.options || {});
+        const unitPrice = (typeof it.price === 'number' && it.price > 0) ? it.price : (calculatedPrice || prod?.basePrice || 450);
+        return {
+            productId: prodId,
+            productName: it.productName || it.name || prod?.name || "كوستر K2rty الذكي",
+            quantity: Number(it.quantity) || 1,
+            price: unitPrice,
+            options: it.options || {}
+        };
+    });
+
     return {
         id: generateOrderId(),
         customer,
-        items,
+        items: normalizedItems,
         notes,
         status: "pending",
         createdAt: new Date().toISOString()
@@ -26,9 +41,24 @@ export function createOrder(customer, items, notes = "") {
 export async function submitOrder(order) {
     try {
         let total = 0;
-        order.items.forEach(item => {
-            total += (item.price || 0) * (item.quantity || 1);
+        const normalizedItems = (order.items || []).map(it => {
+            const prodId = it.productId || it.id || "sticker";
+            const prod = getProductById(prodId);
+            const calculatedPrice = calculatePrice(prodId, it.options || {});
+            const unitPrice = (typeof it.price === 'number' && it.price > 0) ? it.price : (calculatedPrice || prod?.basePrice || 450);
+            const qty = Number(it.quantity) || 1;
+            total += unitPrice * qty;
+
+            return {
+                productId: prodId,
+                productName: it.productName || it.name || prod?.name || "كوستر K2rty الذكي",
+                quantity: qty,
+                price: unitPrice,
+                options: it.options || {}
+            };
         });
+
+        order.items = normalizedItems;
 
         // 1. Submit to Backend API
         let confirmedOrderId = order.id;
@@ -47,14 +77,8 @@ export async function submitOrder(order) {
                         city: order.customer.city,
                         address: order.customer.address || ""
                     },
-                    items: order.items.map(it => ({
-                        productId: it.productId || it.id || "sticker",
-                        productName: it.productName || it.name || "كوستر K2rty الذكي",
-                        quantity: Number(it.quantity) || 1,
-                        price: Number(it.price) || 0,
-                        options: it.options || {}
-                    })),
-                    totalAmount: total,
+                    items: normalizedItems,
+                    totalAmount: total > 0 ? total : 450,
                     notes: order.notes || ""
                 })
             });
@@ -72,7 +96,7 @@ export async function submitOrder(order) {
         }
 
         // 2. Save order locally as well
-        saveLocalOrder({ ...order, id: confirmedOrderId, total });
+        saveLocalOrder({ ...order, id: confirmedOrderId, total: total > 0 ? total : 450 });
 
         // 3. Build WhatsApp message
         let message = `*طلب جديد من موقع K2rty* 🛒\n`;
@@ -86,7 +110,7 @@ export async function submitOrder(order) {
         }
         message += `\n*تفاصيل الطلب:*\n`;
         order.items.forEach((item, index) => {
-            message += `${index + 1}. ${item.productName} (الكمية: ${item.quantity})\n`;
+            message += `${index + 1}. ${item.productName} (الكمية: ${item.quantity}) - السعر: ${item.price} جنيه\n`;
             if (item.options) {
                 Object.entries(item.options).forEach(([key, val]) => {
                     message += `   - ${key === 'customName' ? 'الاسم' : key}: ${val}\n`;
@@ -94,7 +118,7 @@ export async function submitOrder(order) {
             }
         });
 
-        message += `\n💰 *الإجمالي:* ${total} جنيه\n`;
+        message += `\n💰 *الإجمالي:* ${total > 0 ? total : 450} جنيه\n`;
 
         if (order.notes) {
             message += `\n*ملاحظات إضافية:*\n${order.notes}\n`;
