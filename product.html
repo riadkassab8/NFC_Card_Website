@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -16,6 +16,16 @@
     <link rel="prefetch" href="checkout.html">
 </head>
 <body>
+    <script>
+        if (window.location.protocol === 'file:') {
+            window.addEventListener('DOMContentLoaded', function() {
+                var w = document.createElement('div');
+                w.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999999;background:#b91c1c;color:#fff;padding:12px 20px;text-align:center;font-weight:bold;font-size:13px;box-shadow:0 4px 15px rgba(0,0,0,0.3);direction:rtl;';
+                w.innerHTML = '⚠️ تنبيه أمان المتصفح: المتصفحات تمنع تشغيل جافاسكريبت الموديلية عند فتح الملف مباشرة (file:///). يرجى تشغيل الموقع بفتح ملف <b>start-website.bat</b> أو تشغيل <b>npm start</b> لفتحه على الرابط المحلي <a href="http://localhost:4173/" style="color:#fef08a;text-decoration:underline;">http://localhost:4173/</a>';
+                document.body.prepend(w);
+            });
+        }
+    </script>
     <nav class="navbar">
         <div class="container-custom">
             <div class="nav-content">
@@ -90,5 +100,6 @@
         });
     </script>
     <script type="module" src="js/product-page.js"></script>
+    <script type="module" src="js/cms.js"></script>
 </body>
 </html>

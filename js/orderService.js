@@ -1,35 +1,12 @@
-// Order Service - Abstraction Layer for Future Dashboard API Integration
-// This service handles order creation and submission
-// Currently uses localStorage for temporary storage
-// Replace submitOrder function with actual API call when backend is ready
+// Order Service - Direct Backend API Integration & WhatsApp Confirmation
+// Submits orders to the smart-card-qr Backend API & saves to database
+// Opens WhatsApp with order summary for customer confirmation
 
-/**
- * Order Structure:
- * {
- *   id: string,
- *   customer: {
- *     name: string,
- *     phone: string,
- *     city: string
- *   },
- *   items: [
- *     {
- *       productId: string,
- *       productName: string,
- *       quantity: number,
- *       options: object
- *     }
- *   ],
- *   notes: string,
- *   status: string,
- *   createdAt: string
- * }
- */
+import { getApiBaseUrl, getCachedCms } from './cms.js';
 
-// Generate unique order ID
 function generateOrderId() {
     const timestamp = Date.now();
-    const random = Math.floor(Math.random() * 1000);
+    const random = Math.floor(Math.random() * 900 + 100);
     return `K2-${timestamp}-${random}`;
 }
 
@@ -45,55 +22,102 @@ export function createOrder(customer, items, notes = "") {
     };
 }
 
-// Submit order
+// Submit order to Backend API & WhatsApp
 export async function submitOrder(order) {
     try {
-        // Calculate total
         let total = 0;
         order.items.forEach(item => {
-            // Very basic total calc for the message, or we can just pass the total from the cart
-            total += item.price ? (item.price * item.quantity) : 0; 
+            total += (item.price || 0) * (item.quantity || 1);
         });
 
-        // Build WhatsApp Message
-        let message = `*طلب جديد من موقع K2rty* 🛒\n\n`;
+        // 1. Submit to Backend API
+        let confirmedOrderId = order.id;
+        try {
+            const apiBase = getApiBaseUrl();
+            const response = await fetch(`${apiBase}/website/orders`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    customer: {
+                        name: order.customer.name,
+                        phone: order.customer.phone,
+                        city: order.customer.city,
+                        address: order.customer.address || ""
+                    },
+                    items: order.items.map(it => ({
+                        productId: it.productId || it.id || "sticker",
+                        productName: it.productName || it.name || "كوستر K2rty الذكي",
+                        quantity: Number(it.quantity) || 1,
+                        price: Number(it.price) || 0,
+                        options: it.options || {}
+                    })),
+                    totalAmount: total,
+                    notes: order.notes || ""
+                })
+            });
+
+            if (response.ok) {
+                const savedOrder = await response.json();
+                if (savedOrder && savedOrder.orderId) {
+                    confirmedOrderId = savedOrder.orderId;
+                }
+            } else {
+                console.warn("Backend order creation warning:", await response.text());
+            }
+        } catch (apiErr) {
+            console.warn("Network error submitting to backend, order saved locally:", apiErr);
+        }
+
+        // 2. Save order locally as well
+        saveLocalOrder({ ...order, id: confirmedOrderId, total });
+
+        // 3. Build WhatsApp message
+        let message = `*طلب جديد من موقع K2rty* 🛒\n`;
+        message += `رقم الطلب: #${confirmedOrderId}\n\n`;
         message += `*بيانات العميل:*\n`;
         message += `👤 الاسم: ${order.customer.name}\n`;
         message += `📱 رقم الهاتف: ${order.customer.phone}\n`;
         message += `📍 المدينة: ${order.customer.city}\n`;
-        message += `🏠 العنوان: ${order.customer.address}\n\n`;
-        
-        message += `*تفاصيل الطلب:*\n`;
+        if (order.customer.address) {
+            message += `🏠 العنوان: ${order.customer.address}\n`;
+        }
+        message += `\n*تفاصيل الطلب:*\n`;
         order.items.forEach((item, index) => {
             message += `${index + 1}. ${item.productName} (الكمية: ${item.quantity})\n`;
             if (item.options) {
                 Object.entries(item.options).forEach(([key, val]) => {
-                    message += `   - ${key === 'customName' ? 'الاسم المخصص' : key}: ${val}\n`;
+                    message += `   - ${key === 'customName' ? 'الاسم' : key}: ${val}\n`;
                 });
             }
         });
-        
+
+        message += `\n💰 *الإجمالي:* ${total} جنيه\n`;
+
         if (order.notes) {
             message += `\n*ملاحظات إضافية:*\n${order.notes}\n`;
         }
-        
-        // WhatsApp number
-        const phoneNumber = "201098277229";
+
+        // Dynamic WhatsApp number from CMS
+        const cms = getCachedCms();
+        const phoneNumber = cms?.contact?.whatsappNumber || "201098277229";
         const encodedMessage = encodeURIComponent(message);
         const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-        
-        // Open WhatsApp in same tab or new tab
+
+        // Open WhatsApp in new tab
         window.open(whatsappUrl, '_blank');
-        
-        // Clear draft and return success
+
+        // Clear draft
         clearDraftOrder();
-        
+
         return {
             success: true,
-            orderId: order.id,
-            message: "تم توجيهك للواتساب"
+            orderId: confirmedOrderId,
+            message: "تم حفظ الطلب وتوجيهك للواتساب"
         };
-        
+
     } catch (error) {
         console.error('Order submission error:', error);
         return {
@@ -103,8 +127,16 @@ export async function submitOrder(order) {
     }
 }
 
-// Get orders from localStorage (temporary)
-function getLocalOrders() {
+// Local storage helpers
+function saveLocalOrder(order) {
+    try {
+        const orders = getLocalOrders();
+        orders.unshift(order);
+        localStorage.setItem('k2rty_orders', JSON.stringify(orders));
+    } catch (_) {}
+}
+
+export function getLocalOrders() {
     try {
         const orders = localStorage.getItem('k2rty_orders');
         return orders ? JSON.parse(orders) : [];
@@ -113,13 +145,11 @@ function getLocalOrders() {
     }
 }
 
-// Get order by ID
 export function getOrderById(orderId) {
     const orders = getLocalOrders();
     return orders.find(order => order.id === orderId);
 }
 
-// Save draft order
 export function saveDraftOrder(draft) {
     try {
         localStorage.setItem('k2rty_draft', JSON.stringify(draft));
@@ -129,7 +159,6 @@ export function saveDraftOrder(draft) {
     }
 }
 
-// Get draft order
 export function getDraftOrder() {
     try {
         const draft = localStorage.getItem('k2rty_draft');
@@ -139,7 +168,6 @@ export function getDraftOrder() {
     }
 }
 
-// Clear draft order
 export function clearDraftOrder() {
     try {
         localStorage.removeItem('k2rty_draft');
@@ -149,32 +177,20 @@ export function clearDraftOrder() {
     }
 }
 
-// Validate order
 export function validateOrder(order) {
     const errors = [];
-    
     if (!order.customer.name || order.customer.name.trim().length < 2) {
         errors.push("الاسم مطلوب");
     }
-    
-    if (!order.customer.phone || order.customer.phone.trim().length < 11) {
+    if (!order.customer.phone || order.customer.phone.trim().length < 10) {
         errors.push("رقم الهاتف غير صحيح");
     }
-    
     if (!order.customer.city || order.customer.city.trim().length < 2) {
         errors.push("المدينة مطلوبة");
     }
-    
     if (!order.items || order.items.length === 0) {
         errors.push("يجب اختيار منتج واحد على الأقل");
     }
-    
-    order.items.forEach((item, index) => {
-        if (!item.quantity || item.quantity < 1) {
-            errors.push(`الكمية غير صحيحة للمنتج ${index + 1}`);
-        }
-    });
-    
     return {
         valid: errors.length === 0,
         errors

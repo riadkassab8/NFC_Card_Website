@@ -1,0 +1,10 @@
+{
+  "name": "nfc-card-website",
+  "version": "1.0.0",
+  "description": "K2rty Smart Coaster Website",
+  "main": "server.cjs",
+  "scripts": {
+    "start": "node server.cjs",
+    "dev": "node server.cjs"
+  }
+}

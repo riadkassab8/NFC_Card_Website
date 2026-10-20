@@ -1239,3 +1239,27 @@ button, input, textarea, select { font-family: inherit; }
     font-size: 0.75rem;
     font-weight: 800;
 }
+
+/* ── Dynamic Announcement Bar ───────────────────────────────────────── */
+.announcement-bar {
+    background: linear-gradient(90deg, #0f766e 0%, #115e59 100%);
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 8px 16px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    z-index: 1001;
+    position: relative;
+}
+.announcement-bar.is-visible {
+    display: flex;
+}
+.announcement-bar a {
+    color: #5eead4;
+    text-decoration: underline;
+    font-weight: 700;
+}

@@ -1,4 +1,6 @@
-export const products = [
+import { getApiBaseUrl } from './cms.js';
+
+export let products = [
     {
         id: "sticker",
         name: "كوستر K2rty الذكي",
@@ -49,8 +51,38 @@ export const products = [
     }
 ];
 
+// Load live products from backend API
+export async function syncLiveProducts() {
+    try {
+        const url = `${getApiBaseUrl()}/website/products`;
+        const res = await fetch(url);
+        if (res.ok) {
+            const serverProducts = await res.json();
+            if (Array.isArray(serverProducts) && serverProducts.length > 0) {
+                products = serverProducts.map(p => ({
+                    ...p,
+                    id: p.productId || p.id,
+                }));
+                localStorage.setItem("k2rty_products_cache", JSON.stringify(products));
+            }
+        }
+    } catch (e) {
+        // use cached or fallback
+        try {
+            const cached = localStorage.getItem("k2rty_products_cache");
+            if (cached) {
+                products = JSON.parse(cached);
+            }
+        } catch (_) {}
+    }
+    return products;
+}
+
+// Auto-sync products
+syncLiveProducts();
+
 export function getProductById(id) {
-    return products.find(p => p.id === id);
+    return products.find(p => p.id === id || p.productId === id);
 }
 
 export function getAllProducts() {
@@ -67,15 +99,17 @@ export function calculatePrice(productId, selectedOptions = {}) {
 
     let totalPrice = product.basePrice;
 
-    product.options.forEach(option => {
-        const selectedValue = selectedOptions[option.id];
-        if (selectedValue) {
-            const choice = option.choices.find(c => c.value === selectedValue);
-            if (choice && choice.priceModifier) {
-                totalPrice += choice.priceModifier;
+    if (product.options && Array.isArray(product.options)) {
+        product.options.forEach(option => {
+            const selectedValue = selectedOptions[option.id];
+            if (selectedValue) {
+                const choice = option.choices.find(c => c.value === selectedValue);
+                if (choice && choice.priceModifier) {
+                    totalPrice += choice.priceModifier;
+                }
             }
-        }
-    });
+        });
+    }
 
     return totalPrice;
 }
@@ -84,12 +118,14 @@ export function getProductImage(productId, selectedOptions = {}) {
     const product = getProductById(productId);
     if (!product) return '';
 
-    for (const option of product.options) {
-        const selectedValue = selectedOptions[option.id];
-        if (selectedValue) {
-            const choice = option.choices.find(c => c.value === selectedValue);
-            if (choice && choice.image) {
-                return choice.image;
+    if (product.options && Array.isArray(product.options)) {
+        for (const option of product.options) {
+            const selectedValue = selectedOptions[option.id];
+            if (selectedValue) {
+                const choice = option.choices.find(c => c.value === selectedValue);
+                if (choice && choice.image) {
+                    return choice.image;
+                }
             }
         }
     }
@@ -120,19 +156,21 @@ export function getPriceBreakdown(productId, selectedOptions = {}) {
         total: product.basePrice
     };
 
-    product.options.forEach(option => {
-        const selectedValue = selectedOptions[option.id];
-        if (selectedValue) {
-            const choice = option.choices.find(c => c.value === selectedValue);
-            if (choice && choice.priceModifier > 0) {
-                breakdown.additions.push({
-                    label: `${option.label}: ${choice.label}`,
-                    price: choice.priceModifier
-                });
-                breakdown.total += choice.priceModifier;
+    if (product.options && Array.isArray(product.options)) {
+        product.options.forEach(option => {
+            const selectedValue = selectedOptions[option.id];
+            if (selectedValue) {
+                const choice = option.choices.find(c => c.value === selectedValue);
+                if (choice && choice.priceModifier > 0) {
+                    breakdown.additions.push({
+                        label: `${option.label}: ${choice.label}`,
+                        price: choice.priceModifier
+                    });
+                    breakdown.total += choice.priceModifier;
+                }
             }
-        }
-    });
+        });
+    }
 
     return breakdown;
 }
