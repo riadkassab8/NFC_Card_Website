@@ -14,8 +14,8 @@ function renderCart() {
         container.innerHTML = `
             <div style="text-align:center;padding:3.5rem 1.5rem;background:#fff;border:1px solid var(--line);border-radius:24px;">
                 <h2 style="font-size:1.4rem;margin-bottom:0.6rem;">السلة فارغة</h2>
-                <p style="color:var(--muted);margin-bottom:1.4rem;">ابدأ بكوستر K2rty الذكي.</p>
-                <a href="product.html?id=sticker" class="btn-primary">اطلب المنتج</a>
+                <p style="color:var(--muted);margin-bottom:1.4rem;">ابدأ باختيار كوستر K2rty الذكي الآن.</p>
+                <a href="product.html?id=sticker" class="btn-primary">اطلب المنتج الآن</a>
             </div>
         `;
         return;
@@ -67,12 +67,12 @@ function renderCart() {
                 <span>المجموع</span><span>${cartTotal} جنيه</span>
             </div>
             <div style="display:flex;justify-content:space-between;margin-bottom:1rem;color:var(--muted);">
-                <span>الشحن</span><span>يُحسب لاحقًا</span>
+                <span>الشحن</span><span style="color:#15803d;font-weight:700;">مجاني</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:1.15rem;font-weight:800;border-top:1px solid var(--line);padding-top:1rem;margin-bottom:1.3rem;">
                 <span>الإجمالي</span><span>${cartTotal} جنيه</span>
             </div>
-            <a href="checkout.html" class="btn-primary btn-lg" style="width:100%;">إتمام الطلب</a>
+            <a href="checkout.html" class="btn-primary btn-lg" style="width:100%;text-align:center;text-decoration:none;">إتمام الطلب</a>
         </div>
     `;
 
@@ -82,8 +82,28 @@ function renderCart() {
 function attachEvents() {
     document.querySelectorAll('.remove-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            removeFromCart(parseInt(e.currentTarget.dataset.index, 10));
-            renderCart();
+            const idx = parseInt(e.currentTarget.dataset.index, 10);
+            if (window.Swal) {
+                window.Swal.fire({
+                    title: 'حذف المنتج من السلة؟',
+                    text: 'هل أنت متأكد من رغبتك في إزالة هذا المنتج من السلة؟',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'نعم، احذف',
+                    cancelButtonText: 'تراجع',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
+                    customClass: { popup: 'swal2-rtl' }
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        removeFromCart(idx);
+                        renderCart();
+                    }
+                });
+            } else {
+                removeFromCart(idx);
+                renderCart();
+            }
         });
     });
 

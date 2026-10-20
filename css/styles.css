@@ -1263,3 +1263,32 @@ button, input, textarea, select { font-family: inherit; }
     text-decoration: underline;
     font-weight: 700;
 }
+
+/* ── SweetAlert2 RTL Styling ───────────────────────────────────────── */
+.swal2-popup {
+    font-family: var(--font-ar) !important;
+    direction: rtl !important;
+    text-align: right !important;
+    border-radius: 24px !important;
+    padding: 24px !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18) !important;
+}
+.swal2-title {
+    font-family: var(--font-ar) !important;
+    font-weight: 800 !important;
+    font-size: 1.35rem !important;
+    color: var(--ink) !important;
+}
+.swal2-html-container {
+    font-family: var(--font-ar) !important;
+    font-size: 0.96rem !important;
+    line-height: 1.7 !important;
+    color: var(--muted) !important;
+}
+.swal2-confirm, .swal2-cancel {
+    font-family: var(--font-ar) !important;
+    font-weight: 700 !important;
+    border-radius: 12px !important;
+    padding: 10px 24px !important;
+    font-size: 0.95rem !important;
+}

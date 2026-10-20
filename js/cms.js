@@ -115,6 +115,89 @@ export const DEFAULT_CMS = {
         email: "contact@k2rty.com",
         address: "القاهرة، مصر"
     },
+    checkoutFields: [
+        {
+            id: "name",
+            label: "الاسم الكامل",
+            placeholder: "الاسم ثلاثي",
+            type: "text",
+            required: true,
+            minLength: 3,
+            pattern: "^[\\u0600-\\u06FFa-zA-Z\\s]{3,50}$",
+            errorMessage: "يرجى إدخال اسم ثلاثي صحيح لا يقل عن 3 أحرف وبدون رموز خاصة.",
+            order: 1
+        },
+        {
+            id: "phone",
+            label: "رقم الهاتف (واتساب)",
+            placeholder: "01xxxxxxxxx",
+            type: "tel",
+            required: true,
+            minLength: 11,
+            pattern: "^01[0125][0-9]{8}$",
+            errorMessage: "يرجى إدخال رقم هاتف واتساب مصري صحيح مكون من 11 رقماً ويبدأ بـ 01.",
+            order: 2
+        },
+        {
+            id: "city",
+            label: "المدينة / المحافظة",
+            placeholder: "مثال: القاهرة، الجيزة، الإسكندرية...",
+            type: "text",
+            required: true,
+            minLength: 2,
+            pattern: "^[\\u0600-\\u06FFa-zA-Z\\s]{2,40}$",
+            errorMessage: "يرجى تحديد المدينة أو المحافظة التابع لها التوصيل.",
+            order: 3
+        },
+        {
+            id: "address",
+            label: "العنوان بالتفصيل",
+            placeholder: "الشارع، رقم العمارة، رقم الشقة أو علامة مميزة",
+            type: "text",
+            required: true,
+            minLength: 6,
+            pattern: "",
+            errorMessage: "يرجى كتابة عنوان التوصيل بالتفصيل لتسهيل وصول مندوب الشحن.",
+            order: 4
+        },
+        {
+            id: "notes",
+            label: "ملاحظات إضافية (اختياري)",
+            placeholder: "أي مواعيد مفضلة للتسليم أو تفاصيل خاصة...",
+            type: "textarea",
+            required: false,
+            minLength: 0,
+            pattern: "",
+            errorMessage: "",
+            order: 5
+        }
+    ],
+    paymentMethods: [
+        {
+            id: "cod",
+            label: "الدفع عند الاستلام",
+            description: "ادفع نقداً عند استلام طلبك ومراجعته مع مندوب الشحن",
+            walletNumber: "",
+            requireReceipt: false,
+            enabled: true
+        },
+        {
+            id: "instapay",
+            label: "إنستا باي (InstaPay)",
+            description: "تحويل فوري عبر تطبيق إنستا باي",
+            walletNumber: "201098277229",
+            requireReceipt: true,
+            enabled: true
+        },
+        {
+            id: "vodafone_cash",
+            label: "فودافون كاش (Vodafone Cash)",
+            description: "تحويل عبر محفظة فودافون كاش",
+            walletNumber: "201098277229",
+            requireReceipt: true,
+            enabled: true
+        }
+    ],
     footerLogo: "K2rty",
     footerTagline: "Your world in one tap.",
     footerCopyright: "© 2026 K2rty. جميع الحقوق محفوظة."

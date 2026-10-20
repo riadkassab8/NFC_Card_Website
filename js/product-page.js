@@ -1,6 +1,6 @@
 import { getProductById, getDefaultProduct, calculatePrice, getProductImage } from './products.js';
 import { addToCart } from './cart.js';
-import { showToast, createFeatureList } from './ui.js';
+import { createFeatureList } from './ui.js';
 
 let currentProduct = null;
 let selectedOptions = {};
@@ -54,7 +54,7 @@ function renderProduct() {
                             <button type="button" id="btnInc">+</button>
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary btn-lg" style="width:100%;">
+                    <button type="submit" class="btn-primary btn-lg" style="width:100%;cursor:pointer;">
                         أضف للسلة — ${price * quantity} ${currentProduct.currency}
                     </button>
                 </form>
@@ -128,11 +128,26 @@ function attachEvents() {
     document.getElementById('addToCartForm').addEventListener('submit', (e) => {
         e.preventDefault();
         addToCart(currentProduct.id, quantity, { ...selectedOptions });
-        if (window.matchMedia('(max-width: 767px)').matches) {
-            window.location.href = 'checkout.html';
-            return;
+        
+        if (window.Swal) {
+            window.Swal.fire({
+                icon: 'success',
+                title: 'تمت الإضافة إلى السلة بنجاح!',
+                html: `<p style="font-size:1rem;color:#475569;">${currentProduct.name} (الكمية: ${quantity})</p>`,
+                showCancelButton: true,
+                confirmButtonText: 'إتمام الطلب الآن',
+                cancelButtonText: 'متابعة التسوق',
+                confirmButtonColor: '#0284c7',
+                cancelButtonColor: '#64748b',
+                customClass: { popup: 'swal2-rtl' }
+            }).then((res) => {
+                if (res.isConfirmed) {
+                    window.location.href = 'checkout.html';
+                }
+            });
+        } else {
+            window.location.href = 'cart.html';
         }
-        showToast('تمت الإضافة إلى السلة');
     });
 
     document.querySelectorAll('.gallery-thumb').forEach(thumb => {
