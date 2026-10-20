@@ -22,13 +22,13 @@ export const DEFAULT_CMS = {
         badgePriceSub: "شامل اختيار اللون",
         badgeTech: "Scan · Connect · Support",
         badgeTechSub: "NFC وQR معًا",
-        heroImage: "assets/images/product/sticker-white.png"
+        heroImage: "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525351/k2rty/k2rty_sticker_white.png"
     },
     video: {
         enabled: true,
         title: "شاهد كيف يعمل K2rty",
         subtitle: "كوستر ذكي يجمع NFC وQR في تصميم واحد. لمسة واحدة وصلت.",
-        videoUrl: "assets/images/New images/WhatsApp Video 2026-10-18 at 7.38.59 PM.mp4",
+        videoUrl: "https://res.cloudinary.com/dls8ootj3/video/upload/v1792525404/k2rty/k2rty_demo_video.mp4",
         caption: "قرّب الهاتف — صفحتك تفتح فوراً بدون تطبيق"
     },
     featuresTitle: "لماذا K2rty؟",
@@ -92,7 +92,7 @@ export const DEFAULT_CMS = {
         "QR جاهز لو العميل فضّل الكاميرا",
         "تصميم واحد يناسب الهوية الشخصية والتجارية"
     ],
-    aboutImage: "assets/images/product/sticker-sage.jpg",
+    aboutImage: "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525358/k2rty/k2rty_sticker_sage.jpg",
     howEyebrow: "SCAN · CONNECT · SUPPORT",
     howTitle: "استخدامه أوضح من الشرح.",
     howSubtitle: "NFC لو الهاتف قريب. QR لو الكاميرا أسهل. الاتنين على نفس الكوستر.",

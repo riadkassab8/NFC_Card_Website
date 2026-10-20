@@ -24,29 +24,29 @@ export let products = [
                         value: "white",
                         label: "أبيض",
                         priceModifier: 0,
-                        image: "assets/images/product/sticker-white.png"
+                        image: "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525351/k2rty/k2rty_sticker_white.png"
                     },
                     {
                         value: "black",
                         label: "أسود",
                         priceModifier: 0,
-                        image: "assets/images/product/sticker-black.png"
+                        image: "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525357/k2rty/k2rty_sticker_black.png"
                     },
                     {
                         value: "sage",
                         label: "زيتي",
                         priceModifier: 0,
-                        image: "assets/images/product/sticker-sage.jpg"
+                        image: "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525358/k2rty/k2rty_sticker_sage.jpg"
                     }
                 ]
             }
         ],
         visualType: "sticker",
-        defaultImage: "assets/images/product/sticker-white.png",
+        defaultImage: "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525351/k2rty/k2rty_sticker_white.png",
         gallery: [
-            "assets/images/product/sticker-white.png",
-            "assets/images/product/sticker-black.png",
-            "assets/images/product/sticker-sage.jpg"
+            "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525351/k2rty/k2rty_sticker_white.png",
+            "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525357/k2rty/k2rty_sticker_black.png",
+            "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525358/k2rty/k2rty_sticker_sage.jpg"
         ]
     }
 ];
