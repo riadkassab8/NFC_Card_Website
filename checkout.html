@@ -79,6 +79,35 @@
                         </div>
                     </div>
 
+                    <!-- Custom Print Section (Only shown if custom print selected) -->
+                    <div id="customPrintSection" style="display:none;background:#f0f9ff;padding:1.4rem;border-radius:16px;border:2px solid #0ea5e9;">
+                        <h3 style="margin:0 0 1rem;font-size:1.1rem;font-weight:700;color:#0369a1;">🎨 تفاصيل الطباعة المخصصة</h3>
+                        
+                        <div class="form-field" style="margin-bottom:1rem;">
+                            <label for="customPrintText" style="font-weight:700;display:block;margin-bottom:0.4rem;">النص المطلوب طباعته *</label>
+                            <input type="text" id="customPrintText" placeholder="مثال: اسم المحل، الشعار، أو أي نص" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid #e2e8f0;font-size:0.92rem;">
+                            <p style="font-size:0.82rem;color:var(--muted);margin-top:0.3rem;">اكتب الاسم أو النص الذي تريد طباعته على الكوستر</p>
+                        </div>
+
+                        <div class="form-field" style="margin-bottom:1rem;">
+                            <label for="customPrintImage" style="font-weight:700;display:block;margin-bottom:0.4rem;">صورة الشعار/التصميم (اختياري)</label>
+                            <div class="file-upload-wrapper">
+                                <label for="customPrintImage" class="file-upload-btn" style="background:#e0f2fe;border-color:#0ea5e9;color:#0369a1;">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    <span>اضغط لرفع صورة الشعار</span>
+                                </label>
+                                <input type="file" id="customPrintImage" accept="image/*">
+                                <p class="file-name" id="customPrintFileName"></p>
+                            </div>
+                            <p style="font-size:0.82rem;color:var(--muted);margin-top:0.3rem;">ارفع صورة الشعار أو التصميم المخصص (PNG, JPG)</p>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="customPrintNotes" style="font-weight:700;display:block;margin-bottom:0.4rem;">ملاحظات إضافية (اختياري)</label>
+                            <textarea id="customPrintNotes" rows="3" placeholder="أي تفاصيل إضافية عن الطباعة المطلوبة..." style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid #e2e8f0;font-size:0.92rem;resize:vertical;"></textarea>
+                        </div>
+                    </div>
+
                     <!-- Order Total Display -->
                     <div style="background:var(--accent-soft);padding:1.1rem 1.4rem;border-radius:16px;display:flex;justify-content:space-between;align-items:center;font-weight:800;">
                         <span>إجمالي الطلب:</span>

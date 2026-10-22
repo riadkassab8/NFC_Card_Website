@@ -121,6 +121,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         totalEl.textContent = `${getCartTotal()} جنيه`;
     }
 
+    // Check if custom print is selected in cart
+    checkCustomPrintSelection(cart);
+
     // 1. Get CMS content (cache first, then live update)
     let cms = getCachedCms();
     renderDynamicForm(cms);
@@ -141,6 +144,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const form = document.getElementById('checkoutForm');
     form?.addEventListener('submit', handleFormSubmit);
 });
+
+function checkCustomPrintSelection(cart) {
+    const customPrintSection = document.getElementById('customPrintSection');
+    if (!customPrintSection) return;
+
+    // Check if any item in cart has custom_print = 'yes'
+    const hasCustomPrint = cart.some(item => {
+        return item.options && item.options.custom_print === 'yes';
+    });
+
+    if (hasCustomPrint) {
+        customPrintSection.style.display = 'block';
+    } else {
+        customPrintSection.style.display = 'none';
+    }
+}
 
 function renderDynamicForm(cms) {
     const fields = (cms?.checkoutFields && cms.checkoutFields.length > 0)
@@ -422,10 +441,52 @@ async function handleFormSubmit(e) {
         }
     }
 
+    // Upload custom print image if selected
+    let customPrintImageUrl = '';
+    const customPrintInput = document.getElementById('customPrintImage');
+    if (customPrintInput && customPrintInput.files && customPrintInput.files.length > 0) {
+        if (window.Swal) {
+            window.Swal.update({
+                title: 'جاري رفع صورة التصميم المخصص...',
+                html: '<p style="color:#64748b;font-size:0.95rem;">يرجى الانتظار ثوانٍ معدودة لرفع صورة التصميم...</p>'
+            });
+        }
+        try {
+            const formData = new FormData();
+            formData.append('file', customPrintInput.files[0]);
+            const uploadRes = await fetch(`${getApiBaseUrl()}/website/upload`, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            if (uploadRes.ok) {
+                const uploadData = await uploadRes.json();
+                customPrintImageUrl = uploadData.url || '';
+            } else {
+                console.warn('Custom print image upload warning:', await uploadRes.text());
+            }
+        } catch (uploadErr) {
+            console.warn('Custom print image upload network error:', uploadErr);
+        }
+    }
+
     try {
         const order = createOrder(customer, cart, finalNotes);
         order.receiptUrl = receiptUrl;
         order.paymentMethod = selectedPayment?.value || 'cod';
+        
+        // Add custom print details if selected
+        const customPrintSection = document.getElementById('customPrintSection');
+        if (customPrintSection && customPrintSection.style.display !== 'none') {
+            order.customPrint = {
+                text: document.getElementById('customPrintText')?.value || '',
+                imageUrl: customPrintImageUrl,
+                notes: document.getElementById('customPrintNotes')?.value || ''
+            };
+        }
+        
         const result = await submitOrder(order);
 
         if (result.success) {

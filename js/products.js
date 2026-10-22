@@ -3,16 +3,17 @@ import { getApiBaseUrl } from './cms.js';
 export let products = [
     {
         id: "sticker",
-        name: "كوستر K2rty الذكي",
-        description: "كوستر NFC وQR بتصميم احترافي. ثبّته على هاتفك، مكتبك، أو واجهة محلك — وعالمك كله يبقى في لمسة واحدة.",
-        basePrice: 450,
+        name: "كوستر K2rty للتقييمات",
+        description: "كوستر NFC وQR مخصص لفتح تقييمات جوجل لمتجرك أو عملك. ثبّته على واجهة محلك أو مكتبك — واجعل عملائك يقيّموك بلمسة واحدة.",
+        basePrice: 650,
         currency: "جنيه",
         features: [
+            "مخصص لتقييمات جوجل Google Reviews",
             "يعمل بتقنية NFC وQR معًا",
             "بدون تطبيق — أي هاتف حديث يكفي",
             "مقاوم للاستخدام اليومي",
             "ثلاث ألوان تناسب هويتك",
-            "جاهز للربط بروابطك وبياناتك"
+            "سهولة التركيب على أي سطح"
         ],
         options: [
             {
@@ -39,6 +40,25 @@ export let products = [
                         image: "https://res.cloudinary.com/dls8ootj3/image/upload/v1792525358/k2rty/k2rty_sticker_sage.jpg"
                     }
                 ]
+            },
+            {
+                id: "custom_print",
+                label: "هل تريد طباعة مخصصة؟",
+                required: true,
+                choices: [
+                    {
+                        value: "no",
+                        label: "لا، التصميم الافتراضي",
+                        priceModifier: 0,
+                        description: "استخدام التصميم الجاهز بدون طباعة مخصصة"
+                    },
+                    {
+                        value: "yes",
+                        label: "نعم، طباعة مخصصة",
+                        priceModifier: 150,
+                        description: "إضافة شعار أو تصميم خاص (شعار المحل، الاسم، إلخ)"
+                    }
+                ]
             }
         ],
         visualType: "sticker",
@@ -53,6 +73,14 @@ export let products = [
 
 // Load live products from backend API
 export async function syncLiveProducts() {
+    // Temporarily disabled to use local data
+    // Clear cache to force reload with new data
+    localStorage.removeItem("k2rty_products_cache");
+    
+    // Always use local products for now
+    return products;
+    
+    /* Disabled API sync
     try {
         const url = `${getApiBaseUrl()}/website/products`;
         const res = await fetch(url);
@@ -76,6 +104,7 @@ export async function syncLiveProducts() {
         } catch (_) {}
     }
     return products;
+    */
 }
 
 // Auto-sync products
