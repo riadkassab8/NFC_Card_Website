@@ -296,7 +296,7 @@ function attachPaymentEvents() {
     const customPrintFileName = document.getElementById('customPrintFileName');
     customPrintInput?.addEventListener('change', (e) => {
         if (e.target.files && e.target.files.length > 0) {
-            if (customPrintFileName) customPrintFileName.textContent = ✓ تم اختيار: ;
+            if (customPrintFileName) customPrintFileName.textContent = '✓ تم اختيار: ' + e.target.files[0].name;
         } else {
             if (customPrintFileName) customPrintFileName.textContent = '';
         }
