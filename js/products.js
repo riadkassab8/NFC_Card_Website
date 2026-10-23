@@ -91,7 +91,12 @@ export async function syncLiveProducts() {
         try {
             const cached = localStorage.getItem('k2rty_products_cache');
             if (cached) {
-                products = JSON.parse(cached);
+                const parsed = JSON.parse(cached);
+                if (Array.isArray(parsed) && !parsed.some(p => p.id === 'sticker' && p.basePrice < 650)) {
+                    products = parsed;
+                } else {
+                    localStorage.removeItem('k2rty_products_cache');
+                }
             }
         } catch (__) {}
     }
