@@ -63,6 +63,15 @@ export function updateQuantity(index, quantity) {
     }
 }
 
+export function updateCartItemOptions(index, newOptions) {
+    const cart = getCart();
+    if (cart[index]) {
+        cart[index].options = { ...cart[index].options, ...newOptions };
+        cart[index].price = calculatePrice(cart[index].productId, cart[index].options);
+        saveCart(cart);
+    }
+}
+
 export function getCartTotal() {
     const cart = getCart();
     return cart.reduce((total, item) => {

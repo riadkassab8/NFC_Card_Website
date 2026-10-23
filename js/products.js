@@ -73,14 +73,6 @@ export let products = [
 
 // Load live products from backend API
 export async function syncLiveProducts() {
-    // Temporarily disabled to use local data
-    // Clear cache to force reload with new data
-    localStorage.removeItem("k2rty_products_cache");
-    
-    // Always use local products for now
-    return products;
-    
-    /* Disabled API sync
     try {
         const url = `${getApiBaseUrl()}/website/products`;
         const res = await fetch(url);
@@ -91,20 +83,19 @@ export async function syncLiveProducts() {
                     ...p,
                     id: p.productId || p.id,
                 }));
-                localStorage.setItem("k2rty_products_cache", JSON.stringify(products));
+                localStorage.setItem('k2rty_products_cache', JSON.stringify(products));
+                return products;
             }
         }
-    } catch (e) {
-        // use cached or fallback
+    } catch (_) {
         try {
-            const cached = localStorage.getItem("k2rty_products_cache");
+            const cached = localStorage.getItem('k2rty_products_cache');
             if (cached) {
                 products = JSON.parse(cached);
             }
-        } catch (_) {}
+        } catch (__) {}
     }
     return products;
-    */
 }
 
 // Auto-sync products
