@@ -18,7 +18,7 @@ export const DEFAULT_CMS = {
         ctaPrimaryLink: "product.html?id=sticker",
         ctaSecondaryText: "شاهد كيف يعمل",
         ctaSecondaryLink: "#how",
-        badgePrice: "450 جنيه",
+        badgePrice: "650 جنيه",
         badgePriceSub: "شامل اختيار اللون",
         badgeTech: "Scan · Connect · Support",
         badgeTechSub: "NFC وQR معًا",

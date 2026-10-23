@@ -291,6 +291,16 @@ function attachPaymentEvents() {
             if (fileName) fileName.textContent = '';
         }
     });
+
+    const customPrintInput = document.getElementById('customPrintImage');
+    const customPrintFileName = document.getElementById('customPrintFileName');
+    customPrintInput?.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            if (customPrintFileName) customPrintFileName.textContent = ✓ تم اختيار: ;
+        } else {
+            if (customPrintFileName) customPrintFileName.textContent = '';
+        }
+    });
 }
 
 async function handleFormSubmit(e) {
@@ -349,6 +359,21 @@ async function handleFormSubmit(e) {
             } catch (err) {
                 console.warn('Pattern error:', err);
             }
+        }
+    }
+
+    // 3.5 Custom Print Validation (Required when custom print selected)
+    const customPrintSectionCheck = document.getElementById('customPrintSection');
+    if (customPrintSectionCheck && customPrintSectionCheck.style.display !== 'none') {
+        const cpText = document.getElementById('customPrintText')?.value.trim();
+        if (!cpText) {
+            await showSwalAlert(
+                'warning',
+                'حقل مطلوب',
+                'يرجى إدخال النص المطلوب طباعته على الكوستر المخصص لإتمام الطلب.'
+            );
+            document.getElementById('customPrintText')?.focus();
+            return;
         }
     }
 
