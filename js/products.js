@@ -46,40 +46,88 @@ const DEFAULT_PRODUCTS = [
     }
 ];
 
+let products = [...DEFAULT_PRODUCTS];
+
+function asPrice(value) {
+    const normalized = String(value ?? '').replace(/[٠-٩]/g, digit => String('٠١٢٣٤٥٦٧٨٩'.indexOf(digit))).replace(/[٬,\s]/g, '');
+    const match = normalized.match(/-?\d+(?:\.\d+)?/);
+    const price = typeof value === 'number' ? value : Number(match?.[0] ?? 0);
+    return Number.isFinite(price) ? price : 0;
+}
+
+function normalizeProduct(product) {
+    if (!product || typeof product !== 'object') return null;
+    const id = product.productId ?? product.id;
+    if (id === undefined || id === null || String(id).trim() === '') return null;
+    return {
+        ...product,
+        id: String(id),
+        productId: product.productId ?? String(id),
+        basePrice: asPrice(product.basePrice ?? product.price ?? 0),
+        currency: product.currency || product.currencyCode || 'جنيه'
+    };
+}
+
+function extractProductList(payload) {
+    if (Array.isArray(payload)) return payload;
+    const candidates = [payload?.products, payload?.data?.products, payload?.data, payload?.items, payload?.data?.items];
+    return candidates.find(Array.isArray) || null;
+}
+
+function useCachedProducts() {
+    try {
+        const cached = JSON.parse(localStorage.getItem('k2rty_products_cache') || 'null');
+        if (Array.isArray(cached) && cached.length) {
+            const normalized = cached.map(normalizeProduct).filter(Boolean);
+            if (normalized.length) products = normalized;
+        }
+    } catch (error) {
+        console.warn('Cached products could not be loaded:', error);
+    }
+}
+
+let productsSyncPromise = null;
+
 // Load live products from backend API
 export async function syncLiveProducts() {
-    // Temporarily disabled to use local data
-    // Clear cache to force reload with new data
-    localStorage.removeItem("k2rty_products_cache");
-    
-    // Always use local products for now
-    return products;
-    
-    /* Disabled API sync
-    try {
-        const url = `${getApiBaseUrl()}/website/products`;
-        const res = await fetch(url);
-        if (res.ok) {
-            const serverProducts = await res.json();
-            if (Array.isArray(serverProducts) && serverProducts.length > 0) {
-                products = serverProducts.map(p => ({
-                    ...p,
-                    id: p.productId || p.id,
-                }));
-                localStorage.setItem("k2rty_products_cache", JSON.stringify(products));
-            }
-        }
-    } catch (e) {
-        // use cached or fallback
+    if (productsSyncPromise) return productsSyncPromise;
+
+    productsSyncPromise = (async () => {
         try {
-            const cached = localStorage.getItem("k2rty_products_cache");
-            if (cached) {
-                products = JSON.parse(cached);
+            const response = await fetch(`${getApiBaseUrl()}/website/products`, {
+                method: 'GET',
+                headers: { Accept: 'application/json' },
+                cache: 'no-store'
+            });
+            if (!response.ok) throw new Error(`Products API returned ${response.status}`);
+
+            const payload = await response.json();
+            const serverProducts = extractProductList(payload);
+            if (serverProducts?.length) {
+                const normalized = serverProducts.map(normalizeProduct).filter(Boolean);
+                if (normalized.length) {
+                    products = normalized;
+                    try {
+                        localStorage.setItem('k2rty_products_cache', JSON.stringify(products));
+                    } catch (cacheError) {
+                        console.warn('Products loaded but could not be cached:', cacheError);
+                    }
+                    return products;
+                }
             }
-        } catch (_) {}
+        } catch (error) {
+            console.warn('Live products sync failed; using cached/default products:', error);
+        }
+
+        useCachedProducts();
+        return products;
+    })();
+
+    try {
+        return await productsSyncPromise;
+    } finally {
+        productsSyncPromise = null;
     }
-    return products;
-    */
 }
 
 // Start a non-blocking refresh for pages that import the shared catalog.

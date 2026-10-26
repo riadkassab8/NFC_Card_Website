@@ -29,6 +29,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. Fetch live product directly from Backend API (Dashboard sync)
     try {
         await syncLiveProducts();
+        const syncedProduct = getProductById(productId);
+        if (syncedProduct) {
+            currentProduct = syncedProduct;
+            currentProduct.options?.forEach(opt => {
+                const exists = opt.choices?.some(choice => String(choice.value) === String(selectedOptions[opt.id]));
+                if (!exists && opt.choices?.length > 0) {
+                    selectedOptions[opt.id] = opt.choices[0].value;
+                }
+            });
+            currentSelectedImage = getProductImage(currentProduct.id, selectedOptions) || currentProduct.defaultImage;
+            renderProduct();
+        }
+
         const liveRes = await fetch(`${getApiBaseUrl()}/website/products/${productId}`);
         if (liveRes.ok) {
             const liveData = await liveRes.json();
