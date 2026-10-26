@@ -153,15 +153,23 @@ function checkCustomPrintSelection(cart) {
     const hasCustomPrint = cart.some(item => {
         return item.options && item.options.custom_print === 'yes';
     });
+    const customPrintImage = document.getElementById('customPrintImage');
 
     if (hasCustomPrint) {
-        customPrintSection.style.display = 'block';
+        customPrintSection.style.display = 'flex';
+        customPrintImage?.setAttribute('required', '');
+        customPrintImage?.setAttribute('aria-required', 'true');
     } else {
         customPrintSection.style.display = 'none';
+        customPrintImage?.removeAttribute('required');
+        customPrintImage?.setAttribute('aria-required', 'false');
     }
 }
 
 function renderDynamicForm(cms) {
+    const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[char]));
     const fields = (cms?.checkoutFields && cms.checkoutFields.length > 0)
         ? [...cms.checkoutFields].sort((a, b) => (a.order || 0) - (b.order || 0))
         : FALLBACK_FIELDS;
@@ -177,45 +185,33 @@ function renderDynamicForm(cms) {
     });
 
     fieldsContainer.innerHTML = fields.map(field => {
-        const val = currentValues[field.id] !== undefined ? currentValues[field.id] : '';
-        const reqStar = field.required ? '<span style="color:#ef4444;">*</span>' : '';
-        
-        let inputHtml = '';
-        if (field.type === 'textarea') {
-            inputHtml = `
-                <textarea 
-                    id="field_${field.id}" 
-                    name="${field.id}" 
-                    rows="3" 
-                    placeholder="${field.placeholder || ''}"
-                    data-required="${field.required ? 'true' : 'false'}"
-                    data-min="${field.minLength || 0}"
-                    data-pattern="${field.pattern || ''}"
-                    data-err="${field.errorMessage || ''}"
-                    style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid var(--line);font-family:inherit;font-size:0.92rem;resize:vertical;"
-                >${val}</textarea>
-            `;
-        } else {
-            inputHtml = `
-                <input 
-                    type="${field.type || 'text'}" 
-                    id="field_${field.id}" 
-                    name="${field.id}" 
-                    value="${val}"
-                    placeholder="${field.placeholder || ''}"
-                    data-required="${field.required ? 'true' : 'false'}"
-                    data-min="${field.minLength || 0}"
-                    data-pattern="${field.pattern || ''}"
-                    data-err="${field.errorMessage || ''}"
-                    style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);font-size:0.92rem;"
-                />
-            `;
-        }
+        const fieldId = String(field.id || '');
+        const inputId = `field_${fieldId}`;
+        const value = currentValues[field.id] !== undefined ? currentValues[field.id] : '';
+        const required = field.required ? 'true' : 'false';
+        const fieldType = String(field.type || 'text');
+        const autocomplete = ({ name: 'name', phone: 'tel', city: 'address-level2', address: 'street-address', email: 'email' })[fieldId.toLowerCase()] || 'off';
+        const inputAttributes = `
+            id="${escapeHtml(inputId)}"
+            name="${escapeHtml(fieldId)}"
+            class="checkout-input"
+            dir="rtl"
+            lang="ar"
+            placeholder="${escapeHtml(field.placeholder || '')}"
+            data-required="${required}"
+            data-min="${Number(field.minLength) || 0}"
+            data-pattern="${escapeHtml(field.pattern || '')}"
+            data-err="${escapeHtml(field.errorMessage || '')}"
+            aria-required="${field.required ? 'true' : 'false'}"
+        `;
+        const inputHtml = fieldType === 'textarea'
+            ? `<textarea ${inputAttributes} rows="3" autocomplete="${autocomplete}">${escapeHtml(value)}</textarea>`
+            : `<input type="${escapeHtml(fieldType)}" ${inputAttributes} value="${escapeHtml(value)}" autocomplete="${autocomplete}" ${fieldId.toLowerCase() === 'phone' ? 'inputmode="tel"' : ''} />`;
 
         return `
-            <div class="form-field" style="display:flex;flex-direction:column;gap:5px;">
-                <label for="field_${field.id}" style="font-weight:700;font-size:0.9rem;color:var(--ink);">
-                    ${field.label} ${reqStar}
+            <div class="form-field">
+                <label class="checkout-field-label" for="${escapeHtml(inputId)}">
+                    ${escapeHtml(field.label || fieldId)} ${field.required ? '<span class="checkout-required-mark">*</span>' : ''}
                 </label>
                 ${inputHtml}
             </div>
@@ -229,19 +225,21 @@ function renderDynamicForm(cms) {
 
     const paymentsWrapper = document.getElementById('paymentMethodsWrapper');
     if (!paymentsWrapper) return;
+    const selectedPaymentId = document.querySelector('input[name="paymentMethod"]:checked')?.value;
+    const selectedPaymentIndex = payments.findIndex(payment => String(payment.id) === String(selectedPaymentId));
 
     paymentsWrapper.innerHTML = payments.map((pm, idx) => `
-        <label class="payment-option" style="display:flex;align-items:center;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:#fff;transition:all 0.15s;">
-            <input 
+        <label class="payment-option">
+            <input
                 type="radio" 
                 name="paymentMethod" 
-                value="${pm.id}" 
+                value="${escapeHtml(pm.id)}"
                 data-require-receipt="${pm.requireReceipt ? 'true' : 'false'}"
-                data-wallet="${pm.walletNumber || ''}"
-                data-desc="${pm.description || ''}"
-                ${idx === 0 ? 'checked' : ''}
+                data-wallet="${escapeHtml(pm.walletNumber || '')}"
+                data-desc="${escapeHtml(pm.description || '')}"
+                ${idx === (selectedPaymentIndex >= 0 ? selectedPaymentIndex : 0) ? 'checked' : ''}
             />
-            <span class="payment-label" style="font-weight:700;font-size:0.9rem;">${pm.label}</span>
+            <span class="payment-label">${escapeHtml(pm.label || pm.id)}</span>
         </label>
     `).join('');
 
@@ -262,14 +260,17 @@ function attachPaymentEvents() {
         const requireReceipt = selected.dataset.requireReceipt === 'true';
         const wallet = selected.dataset.wallet;
         const desc = selected.dataset.desc;
+        const escapeHtml = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[char]));
 
         if (paymentInfo) {
             let html = '';
             if (desc) {
-                html += `<div style="font-weight:600;margin-bottom:4px;color:#334155;">${desc}</div>`;
+                html += `<div style="font-weight:600;margin-bottom:4px;color:#334155;">${escapeHtml(desc)}</div>`;
             }
             if (wallet) {
-                html += `<div style="margin-top:6px;color:#0f172a;"><strong>رقم المحفظة / الحساب:</strong> <span style="direction:ltr;display:inline-block;font-weight:800;color:#0284c7;background:#e0f2fe;padding:2px 8px;border-radius:6px;">${wallet}</span></div>`;
+                html += `<div style="margin-top:6px;color:#0f172a;"><strong>رقم المحفظة / الحساب:</strong> <span style="direction:ltr;display:inline-block;font-weight:800;color:#0284c7;background:#e0f2fe;padding:2px 8px;border-radius:6px;">${escapeHtml(wallet)}</span></div>`;
             }
             paymentInfo.innerHTML = html;
             paymentInfo.style.display = html ? 'block' : 'none';
@@ -367,6 +368,19 @@ async function handleFormSubmit(e) {
         }
     }
 
+    const customPrintSection = document.getElementById('customPrintSection');
+    const customPrintInput = document.getElementById('customPrintImage');
+    const customPrintActive = customPrintSection && customPrintSection.style.display !== 'none';
+    if (customPrintActive && (!customPrintInput || !customPrintInput.files || customPrintInput.files.length === 0)) {
+        await showSwalAlert(
+            'warning',
+            'صورة التصميم مطلوبة',
+            'ارفع صورة الشعار أو التصميم لإتمام طلب الطباعة المخصصة.'
+        );
+        customPrintInput?.focus();
+        return;
+    }
+
     // 5. Build Final Order Object
     const cart = getCart();
     if (cart.length === 0) {
@@ -443,8 +457,7 @@ async function handleFormSubmit(e) {
 
     // Upload custom print image if selected
     let customPrintImageUrl = '';
-    const customPrintInput = document.getElementById('customPrintImage');
-    if (customPrintInput && customPrintInput.files && customPrintInput.files.length > 0) {
+    if (customPrintActive && customPrintInput?.files?.length > 0) {
         if (window.Swal) {
             window.Swal.update({
                 title: 'جاري رفع صورة التصميم المخصص...',
@@ -461,14 +474,22 @@ async function handleFormSubmit(e) {
                     'Accept': 'application/json'
                 }
             });
-            if (uploadRes.ok) {
-                const uploadData = await uploadRes.json();
-                customPrintImageUrl = uploadData.url || '';
-            } else {
-                console.warn('Custom print image upload warning:', await uploadRes.text());
-            }
+            if (!uploadRes.ok) throw new Error(`Upload failed with status ${uploadRes.status}`);
+            const uploadData = await uploadRes.json();
+            customPrintImageUrl = uploadData.url || '';
+            if (!customPrintImageUrl) throw new Error('Upload response did not include an image URL');
         } catch (uploadErr) {
             console.warn('Custom print image upload network error:', uploadErr);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'تأكيد الطلب';
+            }
+            await showSwalAlert(
+                'error',
+                'تعذر رفع صورة التصميم',
+                'لم نتمكن من رفع الصورة الآن، ولم يتم إرسال الطلب. تحقق من اتصالك ثم أعد المحاولة.'
+            );
+            return;
         }
     }
 

@@ -14,9 +14,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (_) {}
 
     const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id') || getDefaultProduct().id;
+    const defaultProduct = getDefaultProduct();
+    const productId = urlParams.get('id') || defaultProduct?.id;
 
-    currentProduct = getProductById(productId) || getDefaultProduct();
+    currentProduct = getProductById(productId) || defaultProduct;
+    if (!currentProduct) {
+        document.getElementById('productContainer').innerHTML = `
+            <div class="page-hero">
+                <h1>لا توجد منتجات متاحة الآن</h1>
+                <p>يتم تحديث المجموعة حاليًا. تفضل بزيارة صفحة المنتجات لاحقًا.</p>
+                <a class="btn-primary" href="products.html">العودة إلى المنتجات</a>
+            </div>
+        `;
+        return;
+    }
 
     if (currentProduct.options) {
         currentProduct.options.forEach(opt => {

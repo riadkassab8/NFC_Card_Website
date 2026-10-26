@@ -48,74 +48,124 @@
     </nav>
 
     <section class="section checkout-page">
-        <div class="container-custom" style="max-width:720px;">
-            <div id="checkoutContainer">
-                <h1 class="section-title" style="text-align:center;">إتمام الطلب</h1>
-                <p class="section-lead" style="margin-inline:auto;text-align:center;">بياناتك محمية ومشفرة — خطوة واحدة ونوصّلك طلبك.</p>
-                <form id="checkoutForm" style="display:flex;flex-direction:column;gap:1.2rem;background:#fff;border:1px solid var(--line);border-radius:24px;padding:1.8rem;box-shadow:0 8px 30px rgba(0,0,0,0.03);">
-                    
-                    <!-- Dynamic Form Fields from Backend CMS -->
-                    <div id="checkoutDynamicFields" style="display:flex;flex-direction:column;gap:1.1rem;">
-                        <div style="text-align:center;padding:24px 10px;color:var(--muted);font-size:0.92rem;">جاري تحميل حقول الطلب...</div>
-                    </div>
+        <div class="container-custom checkout-container" id="checkoutContainer">
+            <header class="checkout-header">
+                <div class="eyebrow checkout-kicker"><span class="checkout-live-dot"></span> SECURE CHECKOUT</div>
+                <h1 class="section-title">إتمام الطلب <span>بكل سهولة.</span></h1>
+                <p class="section-lead">ثلاث خطوات بسيطة، وفريقنا يهتم بالباقي.</p>
+                <div class="checkout-trust-row">
+                    <span><b aria-hidden="true">✓</b> بياناتك آمنة</span>
+                    <span><b aria-hidden="true">✓</b> شحن مجاني</span>
+                    <span><b aria-hidden="true">✓</b> دعم مباشر</span>
+                </div>
+            </header>
 
-                    <!-- Payment Methods Section from Backend CMS -->
-                    <div class="form-field" id="paymentSection" style="display:flex;flex-direction:column;gap:0.6rem;">
-                        <label style="font-weight:700;display:block;margin-bottom:0.2rem;">طريقة الدفع *</label>
-                        <div class="payment-methods" id="paymentMethodsWrapper" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;"></div>
-                        <div class="payment-info" id="paymentInfo" style="display:none;background:#f8fafc;padding:12px 16px;border-radius:12px;border:1px solid #e2e8f0;font-size:0.9rem;"></div>
-                        
-                        <div class="form-field" id="receiptField" style="display:none;margin-top:0.4rem;">
-                            <label for="receiptImage" style="font-weight:700;display:block;margin-bottom:0.4rem;">صورة إيصال التحويل *</label>
-                            <div class="file-upload-wrapper">
-                                <label for="receiptImage" class="file-upload-btn">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                    <span>اضغط لرفع صورة الإيصال</span>
-                                </label>
-                                <input type="file" id="receiptImage" accept="image/*">
-                                <p class="file-name" id="fileName"></p>
+            <div class="checkout-layout">
+                <div class="checkout-main-column">
+                    <form id="checkoutForm" class="checkout-form" novalidate autocomplete="on" dir="rtl">
+                        <div class="checkout-stepper" id="checkoutStepper" aria-label="خطوات إتمام الطلب">
+                            <div class="checkout-stepper-track"><span id="checkoutProgress"></span></div>
+                            <ol class="checkout-step-list">
+                                <li data-step-item="1" class="is-active" aria-current="step">
+                                    <button type="button" data-step-target="1"><span class="checkout-step-index">01</span><span class="checkout-step-name">بياناتك</span></button>
+                                </li>
+                                <li data-step-item="2">
+                                    <button type="button" data-step-target="2"><span class="checkout-step-index">02</span><span class="checkout-step-name">التوصيل</span></button>
+                                </li>
+                                <li data-step-item="3">
+                                    <button type="button" data-step-target="3"><span class="checkout-step-index">03</span><span class="checkout-step-name">الدفع والتأكيد</span></button>
+                                </li>
+                            </ol>
+                        </div>
+
+                        <div class="checkout-step-message" id="checkoutStepMessage" role="alert" hidden></div>
+
+                        <section class="checkout-step-panel is-active" data-step-panel="1" aria-labelledby="checkoutStepTitle1">
+                            <div class="checkout-panel-heading">
+                                <span class="checkout-panel-number">01</span>
+                                <div><h2 id="checkoutStepTitle1">بيانات التواصل</h2><p>خلّينا نعرف نوصلك ونأكد طلبك.</p></div>
                             </div>
-                            <p style="font-size:0.82rem;color:var(--muted);margin-top:0.3rem;">يرجى رفع صورة واضحة للإيصال لتأكيد عملية التحويل</p>
-                        </div>
-                    </div>
+                            <div class="checkout-fields-grid" id="checkoutContactFields"></div>
+                            <div class="checkout-fields-source" id="checkoutDynamicFields" aria-hidden="true"></div>
+                            <div class="checkout-inline-note"><span aria-hidden="true">ⓘ</span> سنستخدم بياناتك لتأكيد الطلب والتوصيل فقط.</div>
+                        </section>
 
-                    <!-- Custom Print Section (Only shown if custom print selected) -->
-                    <div id="customPrintSection" style="display:none;background:#f0f9ff;padding:1.4rem;border-radius:16px;border:2px solid #0ea5e9;">
-                        <h3 style="margin:0 0 1rem;font-size:1.1rem;font-weight:700;color:#0369a1;">🎨 تفاصيل الطباعة المخصصة</h3>
-                        
-                        <div class="form-field" style="margin-bottom:1rem;">
-                            <label for="customPrintText" style="font-weight:700;display:block;margin-bottom:0.4rem;">النص المطلوب طباعته *</label>
-                            <input type="text" id="customPrintText" placeholder="مثال: اسم المحل، الشعار، أو أي نص" style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid #e2e8f0;font-size:0.92rem;">
-                            <p style="font-size:0.82rem;color:var(--muted);margin-top:0.3rem;">اكتب الاسم أو النص الذي تريد طباعته على الكوستر</p>
-                        </div>
-
-                        <div class="form-field" style="margin-bottom:1rem;">
-                            <label for="customPrintImage" style="font-weight:700;display:block;margin-bottom:0.4rem;">صورة الشعار/التصميم (اختياري)</label>
-                            <div class="file-upload-wrapper">
-                                <label for="customPrintImage" class="file-upload-btn" style="background:#e0f2fe;border-color:#0ea5e9;color:#0369a1;">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                    <span>اضغط لرفع صورة الشعار</span>
-                                </label>
-                                <input type="file" id="customPrintImage" accept="image/*">
-                                <p class="file-name" id="customPrintFileName"></p>
+                        <section class="checkout-step-panel" data-step-panel="2" aria-labelledby="checkoutStepTitle2" hidden>
+                            <div class="checkout-panel-heading">
+                                <span class="checkout-panel-number">02</span>
+                                <div><h2 id="checkoutStepTitle2">عنوان التوصيل</h2><p>أضف التفاصيل التي تساعدنا نوصل طلبك بدقة.</p></div>
                             </div>
-                            <p style="font-size:0.82rem;color:var(--muted);margin-top:0.3rem;">ارفع صورة الشعار أو التصميم المخصص (PNG, JPG)</p>
+                            <div class="checkout-fields-grid" id="checkoutAddressFields"></div>
+
+                            <div id="customPrintSection" class="checkout-custom-panel" style="display:none;">
+                                <div class="checkout-custom-heading"><span aria-hidden="true">✳</span><div><h3>خلّيها بطابعك</h3><p>تفاصيل الطباعة المخصصة لطلبك.</p></div></div>
+                                <div class="form-field">
+                                    <label for="customPrintText">النص المطلوب طباعته <span class="checkout-required-mark">*</span></label>
+                                    <input type="text" id="customPrintText" class="checkout-input" dir="rtl" placeholder="مثال: اسم المحل أو الشعار">
+                                    <p class="checkout-field-hint">اكتب الاسم أو العبارة التي تريد ظهورها على المنتج.</p>
+                                </div>
+                                <div class="form-field">
+                                    <label for="customPrintImage">صورة الشعار أو التصميم <span class="checkout-required-mark">*</span></label>
+                                    <div class="file-upload-wrapper">
+                                        <label for="customPrintImage" class="file-upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span>ارفع صورة الشعار أو التصميم</span></label>
+                                        <input type="file" id="customPrintImage" accept="image/*" aria-describedby="customPrintImageHint customPrintFileName">
+                                        <p class="file-name" id="customPrintFileName" role="status" aria-live="polite"></p>
+                                    </div>
+                                    <p class="checkout-field-hint" id="customPrintImageHint">رفع الصورة مطلوب لإتمام الطباعة المخصصة. الصيغ المدعومة: PNG أو JPG.</p>
+                                </div>
+                                <div class="form-field">
+                                    <label for="customPrintNotes">ملاحظات التصميم <span class="checkout-optional-mark">اختياري</span></label>
+                                    <textarea id="customPrintNotes" class="checkout-input" rows="3" dir="rtl" placeholder="أخبرنا عن الألوان أو التفاصيل التي تفضلها…"></textarea>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="checkout-step-panel" data-step-panel="3" aria-labelledby="checkoutStepTitle3" hidden>
+                            <div class="checkout-panel-heading">
+                                <span class="checkout-panel-number">03</span>
+                                <div><h2 id="checkoutStepTitle3">طريقة الدفع</h2><p>اختر الأنسب لك، ثم أكد طلبك.</p></div>
+                            </div>
+                            <div class="form-field checkout-payment-block" id="paymentSection">
+                                <label class="checkout-section-label">اختر وسيلة الدفع <span class="checkout-required-mark">*</span></label>
+                                <div class="payment-methods" id="paymentMethodsWrapper"></div>
+                                <div class="payment-info" id="paymentInfo" style="display:none;"></div>
+                                <div class="form-field checkout-receipt-field" id="receiptField" style="display:none;">
+                                    <label for="receiptImage">صورة إيصال التحويل <span class="checkout-required-mark">*</span></label>
+                                    <div class="file-upload-wrapper">
+                                        <label for="receiptImage" class="file-upload-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg><span>اضغط لرفع صورة الإيصال</span></label>
+                                        <input type="file" id="receiptImage" accept="image/*">
+                                        <p class="file-name" id="fileName"></p>
+                                    </div>
+                                    <p class="checkout-field-hint">ارفع صورة واضحة حتى نتمكن من تأكيد التحويل.</p>
+                                </div>
+                            </div>
+                            <div class="checkout-total-card">
+                                <div><span>الإجمالي شامل الشحن</span><small>الشحن مجاني على طلبك</small></div>
+                                <strong id="checkoutTotal">0 جنيه</strong>
+                            </div>
+                            <p class="checkout-final-note"><span aria-hidden="true">✓</span> بمراجعة طلبك، سيتم إرساله مباشرة لفريق K2rty لتأكيده.</p>
+                        </section>
+
+                        <div class="checkout-form-actions">
+                            <a href="cart.html" class="checkout-back-to-cart">العودة إلى السلة</a>
+                            <div class="checkout-action-buttons">
+                                <button type="button" id="checkoutPrevious" class="checkout-prev-button" hidden>السابق</button>
+                                <button type="button" id="checkoutNext" class="btn-primary btn-lg checkout-next-button">متابعة <span aria-hidden="true">←</span></button>
+                                <button type="submit" id="submitBtn" class="btn-primary btn-lg checkout-submit-button" hidden>تأكيد الطلب <span aria-hidden="true">✓</span></button>
+                            </div>
                         </div>
+                    </form>
+                </div>
 
-                        <div class="form-field">
-                            <label for="customPrintNotes" style="font-weight:700;display:block;margin-bottom:0.4rem;">ملاحظات إضافية (اختياري)</label>
-                            <textarea id="customPrintNotes" rows="3" placeholder="أي تفاصيل إضافية عن الطباعة المطلوبة..." style="width:100%;padding:10px 14px;border-radius:12px;border:1px solid #e2e8f0;font-size:0.92rem;resize:vertical;"></textarea>
-                        </div>
+                <aside class="checkout-aside" aria-label="ملخص الطلب">
+                    <div class="checkout-summary-card">
+                        <div class="checkout-summary-heading"><div><span class="checkout-summary-eyebrow">YOUR ORDER</span><h2>ملخص طلبك</h2></div><span class="checkout-lock" aria-hidden="true">✓</span></div>
+                        <div class="checkout-summary-items" id="checkoutSummaryItems"></div>
+                        <div class="checkout-summary-lines"><div><span>الشحن</span><strong class="checkout-free-shipping">مجاني</strong></div><div class="checkout-summary-total"><span>الإجمالي</span><strong id="checkoutSummaryTotal">0 جنيه</strong></div></div>
+                        <div class="checkout-summary-assurance"><span aria-hidden="true">◈</span><span>دفع آمن، وخدمة توصيل موثوقة لباب بيتك.</span></div>
                     </div>
-
-                    <!-- Order Total Display -->
-                    <div style="background:var(--accent-soft);padding:1.1rem 1.4rem;border-radius:16px;display:flex;justify-content:space-between;align-items:center;font-weight:800;">
-                        <span>إجمالي الطلب:</span>
-                        <span id="checkoutTotal" style="font-size:1.25rem;color:var(--ink);">0 جنيه</span>
-                    </div>
-
-                    <button type="submit" id="submitBtn" class="btn-primary btn-lg" style="width:100%;cursor:pointer;">تأكيد الطلب</button>
-                </form>
+                    <div class="checkout-help-card"><span class="checkout-help-icon" aria-hidden="true">?</span><div><strong>تحتاج مساعدة؟</strong><p>نحن هنا لمساعدتك في أي وقت.</p></div></div>
+                </aside>
             </div>
         </div>
     </section>
@@ -143,6 +193,7 @@
     </a>
 
     <script type="module" src="js/checkout.js"></script>
+    <script type="module" src="js/checkout-wizard.js"></script>
     <script type="module" src="js/cms.js"></script>
 </body>
 </html>

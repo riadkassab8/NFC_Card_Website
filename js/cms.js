@@ -213,12 +213,20 @@ export const DEFAULT_LINKS = [
         order: 1
     },
     {
+        title: "المنتجات",
+        url: "products.html",
+        location: "both",
+        target: "_self",
+        isActive: true,
+        order: 2
+    },
+    {
         title: "عن K2rty",
         url: "about.html",
         location: "both",
         target: "_self",
         isActive: true,
-        order: 2
+        order: 3
     },
     {
         title: "كيف تعمل",
@@ -226,7 +234,7 @@ export const DEFAULT_LINKS = [
         location: "both",
         target: "_self",
         isActive: true,
-        order: 3
+        order: 4
     },
     {
         title: "اطلب الآن",
@@ -234,7 +242,7 @@ export const DEFAULT_LINKS = [
         location: "footer",
         target: "_self",
         isActive: true,
-        order: 4
+        order: 5
     }
 ];
 
@@ -320,14 +328,30 @@ const ICONS_SVG = {
 };
 
 export function applyLinksToDom(links) {
-    if (!Array.isArray(links) || links.length === 0) return;
+    const resolvedLinks = Array.isArray(links) ? [...links] : [];
+    const hasCatalogLink = resolvedLinks.some(link => {
+        const url = String(link.url || "").split("?")[0].replace(/^\.?\//, "");
+        return url === "products.html" && link.isActive;
+    });
+    if (!hasCatalogLink) {
+        const catalogLink = {
+            title: "المنتجات",
+            url: "products.html",
+            location: "both",
+            target: "_self",
+            isActive: true,
+            order: 2
+        };
+        const homeIndex = resolvedLinks.findIndex(link => String(link.url || "").split("?")[0] === "index.html");
+        resolvedLinks.splice(homeIndex >= 0 ? homeIndex + 1 : 0, 0, catalogLink);
+    }
 
     const currentPath = window.location.pathname.split("/").pop() || "index.html";
 
     // 1. Header Navigation links
     const navLinksContainer = document.getElementById("navLinks");
     if (navLinksContainer) {
-        const headerLinks = links.filter(l => l.isActive && (l.location === 'header' || l.location === 'both'));
+        const headerLinks = resolvedLinks.filter(l => l.isActive && (l.location === 'header' || l.location === 'both'));
         let linksHtml = headerLinks.map(link => {
             const isCurrent = currentPath === link.url || (currentPath === "" && link.url === "index.html");
             const targetAttr = link.target === "_blank" ? 'target="_blank" rel="noreferrer"' : '';
@@ -347,11 +371,22 @@ export function applyLinksToDom(links) {
     // 2. Footer links
     const footerLinksContainer = document.querySelector(".footer-links");
     if (footerLinksContainer) {
-        const footerLinks = links.filter(l => l.isActive && (l.location === 'footer' || l.location === 'both'));
+        const footerLinks = resolvedLinks.filter(l => l.isActive && (l.location === 'footer' || l.location === 'both'));
         footerLinksContainer.innerHTML = footerLinks.map(link => {
             const targetAttr = link.target === "_blank" ? 'target="_blank" rel="noreferrer"' : '';
             return `<a class="footer-link" href="${link.url}" ${targetAttr}>${link.title}</a>`;
         }).join("");
+    }
+
+    const bottomNav = document.querySelector(".bottom-nav-inner");
+    if (bottomNav && !bottomNav.querySelector('a[href="products.html"]')) {
+        const catalogItem = document.createElement("a");
+        catalogItem.href = "products.html";
+        catalogItem.className = `bottom-nav-item ${currentPath === "products.html" ? "active" : ""}`;
+        if (currentPath === "products.html") catalogItem.setAttribute("aria-current", "page");
+        catalogItem.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg><span>المنتجات</span>`;
+        const cartItem = bottomNav.querySelector('a[href="cart.html"]');
+        bottomNav.insertBefore(catalogItem, cartItem || null);
     }
 }
 
