@@ -1,7 +1,7 @@
-import { getCart, getCartTotal, clearCart } from './cart.js';
+import { getCart, getCartTotal, clearCart, updateQuantity, updateCartItemOptions, removeFromCart } from './cart.js';
 import { createOrder, submitOrder } from './orderService.js';
 import { getCachedCms, fetchLiveCms, getApiBaseUrl } from './cms.js';
-import { syncLiveProducts } from './products.js';
+import { syncLiveProducts, getProductById, calculatePrice, getProductImage, getOptionLabel } from './products.js';
 
 const FALLBACK_FIELDS = [
     {
@@ -121,6 +121,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         totalEl.textContent = `${getCartTotal()} جنيه`;
     }
 
+    // Render dynamic items (quantity & print type)
+    renderOrderItemsConfig();
+
     // Check if custom print is selected in cart
     checkCustomPrintSelection(cart);
 
@@ -144,6 +147,142 @@ document.addEventListener('DOMContentLoaded', async () => {
     const form = document.getElementById('checkoutForm');
     form?.addEventListener('submit', handleFormSubmit);
 });
+
+function renderOrderItemsConfig() {
+    const container = document.getElementById('checkoutOrderItems');
+    if (!container) return;
+
+    const cart = getCart();
+    if (cart.length === 0) {
+        window.location.href = 'cart.html';
+        return;
+    }
+
+    const total = getCartTotal();
+    const totalEl = document.getElementById('checkoutTotal');
+    if (totalEl) totalEl.textContent = `${total} جنيه`;
+
+    const submitBtn = document.getElementById('submitBtn');
+    if (submitBtn && !submitBtn.disabled) {
+        submitBtn.textContent = `تأكيد الطلب — ${total} جنيه`;
+    }
+
+    checkCustomPrintSelection(cart);
+
+    container.innerHTML = `
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding-bottom:8px;">
+                <span style="font-weight:800;font-size:0.95rem;color:#0f172a;display:flex;align-items:center;gap:6px;">
+                    🛍️ المنتجات المطلوبة والكمية
+                </span>
+                <span style="font-size:0.78rem;font-weight:700;background:#e0f2fe;color:#0369a1;padding:2px 8px;border-radius:6px;">
+                    ${cart.length} ${cart.length === 1 ? 'عنصر' : 'عناصر'}
+                </span>
+            </div>
+            
+            <div style="display:flex;flex-direction:column;gap:10px;">
+                ${cart.map((item, idx) => {
+                    const prod = getProductById(item.productId);
+                    const basePrice = prod ? prod.basePrice : 650;
+                    const unitPrice = calculatePrice(item.productId, item.options);
+                    const image = getProductImage(item.productId, item.options) || prod?.defaultImage || 'assets/images/product/sticker-white.png';
+                    const customPrintVal = item.options?.custom_print || 'no';
+                    const colorLabel = item.options?.color ? getOptionLabel(item.productId, 'color', item.options.color) : '';
+
+                    const cpOption = prod?.options?.find(o => o.id === 'custom_print');
+                    const noChoice = cpOption?.choices?.find(c => c.value === 'no') || { label: 'لا، التصميم الافتراضي', priceModifier: 0 };
+                    const yesChoice = cpOption?.choices?.find(c => c.value === 'yes') || { label: 'نعم، طباعة مخصصة', priceModifier: 150 };
+
+                    const defaultPrice = basePrice + (noChoice.priceModifier || 0);
+                    const customPrice = basePrice + (yesChoice.priceModifier || 150);
+
+                    return `
+                        <div style="background:#ffffff;border:1px solid #cbd5e1;border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+                                <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+                                    <img src="${image}" alt="${prod?.name || item.productName}" style="width:48px;height:48px;object-fit:contain;border-radius:8px;background:#f1f5f9;border:1px solid #e2e8f0;padding:2px;flex-shrink:0;">
+                                    <div style="flex:1;min-width:0;">
+                                        <div style="font-weight:800;font-size:0.92rem;color:#0f172a;text-overflow:ellipsis;overflow:hidden;white-space:nowrap;">${prod?.name || item.productName}</div>
+                                        <div style="font-size:0.78rem;color:#64748b;margin-top:2px;">
+                                            ${colorLabel ? `اللون: <strong style="color:#334155;">${colorLabel}</strong> · ` : ''}
+                                            <span style="color:#0284c7;font-weight:700;">${unitPrice} ج للقطعة</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="display:flex;align-items:center;gap:6px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:3px 6px;">
+                                    <button type="button" class="btn-checkout-qty" data-action="dec" data-idx="${idx}" style="width:26px;height:26px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;cursor:pointer;font-weight:800;font-size:0.95rem;display:flex;align-items:center;justify-content:center;color:#334155;">−</button>
+                                    <span style="font-weight:800;font-size:0.9rem;min-width:22px;text-align:center;">${item.quantity}</span>
+                                    <button type="button" class="btn-checkout-qty" data-action="inc" data-idx="${idx}" style="width:26px;height:26px;border-radius:6px;border:1px solid #cbd5e1;background:#ffffff;cursor:pointer;font-weight:800;font-size:0.95rem;display:flex;align-items:center;justify-content:center;color:#334155;">+</button>
+                                </div>
+                            </div>
+
+                            <!-- Print Type Selector -->
+                            <div style="border-top:1px dashed #e2e8f0;padding-top:8px;">
+                                <div style="font-size:0.8rem;font-weight:700;color:#475569;margin-bottom:6px;">نوع الطباعة:</div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                                    <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1.5px solid ${customPrintVal === 'no' ? '#0284c7' : '#cbd5e1'};background:${customPrintVal === 'no' ? '#f0f9ff' : '#ffffff'};cursor:pointer;transition:all 0.15s;">
+                                        <input type="radio" name="item_print_${idx}" value="no" ${customPrintVal === 'no' ? 'checked' : ''} data-idx="${idx}" class="print-type-radio" style="accent-color:#0284c7;">
+                                        <div style="display:flex;flex-direction:column;">
+                                            <span style="font-size:0.82rem;font-weight:700;color:${customPrintVal === 'no' ? '#0369a1' : '#334155'};">تصميم افتراضي</span>
+                                            <span style="font-size:0.74rem;color:#64748b;">${defaultPrice} جنيه</span>
+                                        </div>
+                                    </label>
+
+                                    <label style="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1.5px solid ${customPrintVal === 'yes' ? '#0284c7' : '#cbd5e1'};background:${customPrintVal === 'yes' ? '#f0f9ff' : '#ffffff'};cursor:pointer;transition:all 0.15s;">
+                                        <input type="radio" name="item_print_${idx}" value="yes" ${customPrintVal === 'yes' ? 'checked' : ''} data-idx="${idx}" class="print-type-radio" style="accent-color:#0284c7;">
+                                        <div style="display:flex;flex-direction:column;">
+                                            <span style="font-size:0.82rem;font-weight:700;color:${customPrintVal === 'yes' ? '#0369a1' : '#334155'};">طباعة مخصصة 🎨</span>
+                                            <span style="font-size:0.74rem;color:#0284c7;font-weight:700;">${customPrice} جنيه (+150 ج)</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `;
+
+    attachOrderItemEvents();
+}
+
+function attachOrderItemEvents() {
+    document.querySelectorAll('.btn-checkout-qty').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const idx = parseInt(e.currentTarget.dataset.idx, 10);
+            const action = e.currentTarget.dataset.action;
+            const cart = getCart();
+            let qty = cart[idx].quantity;
+            if (action === 'inc') {
+                qty++;
+                updateQuantity(idx, qty);
+                renderOrderItemsConfig();
+            } else if (action === 'dec') {
+                if (qty > 1) {
+                    qty--;
+                    updateQuantity(idx, qty);
+                    renderOrderItemsConfig();
+                } else if (cart.length > 1) {
+                    if (confirm('هل تريد إزالة هذا المنتج من الطلب؟')) {
+                        removeFromCart(idx);
+                        renderOrderItemsConfig();
+                    }
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll('.print-type-radio').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const idx = parseInt(e.target.dataset.idx, 10);
+            const printType = e.target.value;
+            updateCartItemOptions(idx, { custom_print: printType });
+            renderOrderItemsConfig();
+        });
+    });
+}
 
 function checkCustomPrintSelection(cart) {
     const customPrintSection = document.getElementById('customPrintSection');
@@ -292,6 +431,16 @@ function attachPaymentEvents() {
             if (fileName) fileName.textContent = '';
         }
     });
+
+    const customPrintInput = document.getElementById('customPrintImage');
+    const customPrintFileName = document.getElementById('customPrintFileName');
+    customPrintInput?.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files.length > 0) {
+            if (customPrintFileName) customPrintFileName.textContent = '✓ تم اختيار: ' + e.target.files[0].name;
+        } else {
+            if (customPrintFileName) customPrintFileName.textContent = '';
+        }
+    });
 }
 
 async function handleFormSubmit(e) {
@@ -350,6 +499,21 @@ async function handleFormSubmit(e) {
             } catch (err) {
                 console.warn('Pattern error:', err);
             }
+        }
+    }
+
+    // 3.5 Custom Print Validation (Required when custom print selected)
+    const customPrintSectionCheck = document.getElementById('customPrintSection');
+    if (customPrintSectionCheck && customPrintSectionCheck.style.display !== 'none') {
+        const cpText = document.getElementById('customPrintText')?.value.trim();
+        if (!cpText) {
+            await showSwalAlert(
+                'warning',
+                'حقل مطلوب',
+                'يرجى إدخال النص المطلوب طباعته على الكوستر المخصص لإتمام الطلب.'
+            );
+            document.getElementById('customPrintText')?.focus();
+            return;
         }
     }
 

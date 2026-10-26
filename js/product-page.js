@@ -1,4 +1,5 @@
 import { getProductById, getDefaultProduct, calculatePrice, getProductImage, syncLiveProducts } from './products.js';
+import { getApiBaseUrl } from './cms.js';
 import { addToCart } from './cart.js';
 import { createFeatureList } from './ui.js';
 
@@ -8,35 +9,49 @@ let quantity = 1;
 let currentSelectedImage = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Fetch live products from backend
-    try {
-        await syncLiveProducts();
-    } catch (_) {}
-
     const urlParams = new URLSearchParams(window.location.search);
     const defaultProduct = getDefaultProduct();
     const productId = urlParams.get('id') || defaultProduct?.id;
 
-    currentProduct = getProductById(productId) || defaultProduct;
-    if (!currentProduct) {
-        document.getElementById('productContainer').innerHTML = `
-            <div class="page-hero">
-                <h1>لا توجد منتجات متاحة الآن</h1>
-                <p>يتم تحديث المجموعة حاليًا. تفضل بزيارة صفحة المنتجات لاحقًا.</p>
-                <a class="btn-primary" href="products.html">العودة إلى المنتجات</a>
-            </div>
-        `;
-        return;
-    }
+    currentProduct = getProductById(productId) || getDefaultProduct();
 
     if (currentProduct.options) {
         currentProduct.options.forEach(opt => {
-            selectedOptions[opt.id] = opt.choices[0].value;
+            if (!selectedOptions[opt.id] && opt.choices?.length > 0) {
+                selectedOptions[opt.id] = opt.choices[0].value;
+            }
         });
     }
 
     currentSelectedImage = getProductImage(currentProduct.id, selectedOptions) || currentProduct.defaultImage;
     renderProduct();
+
+    // 2. Fetch live product directly from Backend API (Dashboard sync)
+    try {
+        await syncLiveProducts();
+        const liveRes = await fetch(`${getApiBaseUrl()}/website/products/${productId}`);
+        if (liveRes.ok) {
+            const liveData = await liveRes.json();
+            if (liveData && (liveData.productId || liveData.id)) {
+                currentProduct = {
+                    ...liveData,
+                    id: liveData.productId || liveData.id,
+                };
+                if (currentProduct.options) {
+                    currentProduct.options.forEach(opt => {
+                        const exists = opt.choices?.some(c => c.value === selectedOptions[opt.id]);
+                        if (!exists && opt.choices?.length > 0) {
+                            selectedOptions[opt.id] = opt.choices[0].value;
+                        }
+                    });
+                }
+                currentSelectedImage = getProductImage(currentProduct.id, selectedOptions) || currentProduct.defaultImage;
+                renderProduct();
+            }
+        }
+    } catch (err) {
+        console.warn('Live product sync warning:', err);
+    }
 });
 
 function renderProduct() {
@@ -93,7 +108,7 @@ function renderOptionsForm() {
                     return `
                         <label class="option-choice ${isSelected ? 'is-selected' : ''}">
                             <input type="radio" name="opt_${option.id}" value="${choice.value}" ${isSelected ? 'checked' : ''} hidden>
-                            <div>${choice.label}</div>
+                            <div>${choice.label}${choice.priceModifier > 0 ? ` <span style="color:#0284c7;font-weight:700;">(+${choice.priceModifier} ${currentProduct.currency})</span>` : ''}</div>
                         </label>
                     `;
                 }).join('')}

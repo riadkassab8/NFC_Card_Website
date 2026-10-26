@@ -17,7 +17,7 @@ export function createOrder(customer, items, notes = "") {
         const prodId = it.productId || it.id || "sticker";
         const prod = getProductById(prodId);
         const calculatedPrice = calculatePrice(prodId, it.options || {});
-        const unitPrice = (typeof it.price === 'number' && it.price > 0) ? it.price : (calculatedPrice || prod?.basePrice || 450);
+        const unitPrice = (typeof it.price === 'number' && it.price > 0) ? it.price : (calculatedPrice || prod?.basePrice || 650);
         return {
             productId: prodId,
             productName: it.productName || it.name || prod?.name || "كوستر K2rty الذكي",
@@ -45,7 +45,7 @@ export async function submitOrder(order) {
             const prodId = it.productId || it.id || "sticker";
             const prod = getProductById(prodId);
             const calculatedPrice = calculatePrice(prodId, it.options || {});
-            const unitPrice = (typeof it.price === 'number' && it.price > 0) ? it.price : (calculatedPrice || prod?.basePrice || 450);
+            const unitPrice = (typeof it.price === 'number' && it.price > 0) ? it.price : (calculatedPrice || prod?.basePrice || 650);
             const qty = Number(it.quantity) || 1;
             total += unitPrice * qty;
 
@@ -78,10 +78,11 @@ export async function submitOrder(order) {
                         address: order.customer.address || ""
                     },
                     items: normalizedItems,
-                    totalAmount: total > 0 ? total : 450,
+                    totalAmount: total > 0 ? total : 650,
                     notes: order.notes || "",
                     receiptUrl: order.receiptUrl || "",
-                    paymentMethod: order.paymentMethod || ""
+                    paymentMethod: order.paymentMethod || "",
+                    customPrint: order.customPrint || null
                 })
             });
 
@@ -98,7 +99,7 @@ export async function submitOrder(order) {
         }
 
         // 2. Save order locally as well
-        saveLocalOrder({ ...order, id: confirmedOrderId, total: total > 0 ? total : 450 });
+        saveLocalOrder({ ...order, id: confirmedOrderId, total: total > 0 ? total : 650 });
 
         // 3. Build WhatsApp message
         let message = `*طلب جديد من موقع K2rty* 🛒\n`;
@@ -120,7 +121,7 @@ export async function submitOrder(order) {
             }
         });
 
-        message += `\n💰 *الإجمالي:* ${total > 0 ? total : 450} جنيه\n`;
+        message += `\n💰 *الإجمالي:* ${total > 0 ? total : 650} جنيه\n`;
 
         if (order.paymentMethod) {
             let pLabel = order.paymentMethod;
@@ -132,6 +133,17 @@ export async function submitOrder(order) {
 
         if (order.receiptUrl) {
             message += `🧾 *صورة إيصال التحويل:* ${order.receiptUrl}\n`;
+        }
+
+        if (order.customPrint && order.customPrint.text) {
+            message += `\n🎨 *تفاصيل الطباعة المخصصة:*\n`;
+            message += `✍️ النص: ${order.customPrint.text}\n`;
+            if (order.customPrint.imageUrl) {
+                message += `🖼️ صورة التصميم: ${order.customPrint.imageUrl}\n`;
+            }
+            if (order.customPrint.notes) {
+                message += `📝 ملاحظات: ${order.customPrint.notes}\n`;
+            }
         }
 
         if (order.notes) {

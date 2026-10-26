@@ -48,35 +48,16 @@
     </nav>
 
     <section class="section checkout-page">
-        <div class="container-custom checkout-container" id="checkoutContainer">
-            <header class="checkout-header">
-                <div class="eyebrow checkout-kicker"><span class="checkout-live-dot"></span> SECURE CHECKOUT</div>
-                <h1 class="section-title">إتمام الطلب <span>بكل سهولة.</span></h1>
-                <p class="section-lead">ثلاث خطوات بسيطة، وفريقنا يهتم بالباقي.</p>
-                <div class="checkout-trust-row">
-                    <span><b aria-hidden="true">✓</b> بياناتك آمنة</span>
-                    <span><b aria-hidden="true">✓</b> شحن مجاني</span>
-                    <span><b aria-hidden="true">✓</b> دعم مباشر</span>
-                </div>
-            </header>
-
-            <div class="checkout-layout">
-                <div class="checkout-main-column">
-                    <form id="checkoutForm" class="checkout-form" novalidate autocomplete="on" dir="rtl">
-                        <div class="checkout-stepper" id="checkoutStepper" aria-label="خطوات إتمام الطلب">
-                            <div class="checkout-stepper-track"><span id="checkoutProgress"></span></div>
-                            <ol class="checkout-step-list">
-                                <li data-step-item="1" class="is-active" aria-current="step">
-                                    <button type="button" data-step-target="1"><span class="checkout-step-index">01</span><span class="checkout-step-name">بياناتك</span></button>
-                                </li>
-                                <li data-step-item="2">
-                                    <button type="button" data-step-target="2"><span class="checkout-step-index">02</span><span class="checkout-step-name">التوصيل</span></button>
-                                </li>
-                                <li data-step-item="3">
-                                    <button type="button" data-step-target="3"><span class="checkout-step-index">03</span><span class="checkout-step-name">الدفع والتأكيد</span></button>
-                                </li>
-                            </ol>
-                        </div>
+        <div class="container-custom" style="max-width:720px;">
+            <div id="checkoutContainer">
+                <h1 class="section-title" style="text-align:center;">إتمام الطلب</h1>
+                <p class="section-lead" style="margin-inline:auto;text-align:center;">بياناتك محمية ومشفرة — خطوة واحدة ونوصّلك طلبك.</p>
+                <form id="checkoutForm" style="display:flex;flex-direction:column;gap:1.2rem;background:#fff;border:1px solid var(--line);border-radius:24px;padding:1.8rem;box-shadow:0 8px 30px rgba(0,0,0,0.03);">
+                    
+                    <!-- Dynamic Form Fields from Backend CMS -->
+                    <div id="checkoutDynamicFields" style="display:flex;flex-direction:column;gap:1.1rem;">
+                        <div style="text-align:center;padding:24px 10px;color:var(--muted);font-size:0.92rem;">جاري تحميل حقول الطلب...</div>
+                    </div>
 
                         <div class="checkout-step-message" id="checkoutStepMessage" role="alert" hidden></div>
 
