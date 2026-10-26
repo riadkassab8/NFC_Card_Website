@@ -83,6 +83,30 @@
             </div>
         </section>
 
+        <section class="home-featured" id="homeFeatured" hidden aria-label="منتجات K2rty المميزة" aria-roledescription="عارض منتجات">
+            <div class="container-custom">
+                <div class="home-featured-heading">
+                    <div>
+                        <div class="eyebrow"><span class="home-featured-live-dot"></span> K2RTY / THE SPOTLIGHT</div>
+                        <h2>كل منتج له حكايته.</h2>
+                        <p>اكتشف أحدث إضافاتنا — والصور هتتبدّل لوحدها عشان تشوف كل تفصيلة.</p>
+                    </div>
+                    <a href="products.html" class="home-featured-all">شوف كل المنتجات <span aria-hidden="true">←</span></a>
+                </div>
+                <div class="home-featured-card" id="homeFeaturedCard"></div>
+                <div class="home-featured-footer">
+                    <div class="home-featured-controls" aria-label="التنقل بين المنتجات">
+                        <button class="home-featured-control" id="homeFeaturedPrevious" type="button" aria-label="المنتج السابق"><span aria-hidden="true">→</span></button>
+                        <button class="home-featured-control" id="homeFeaturedNext" type="button" aria-label="المنتج التالي"><span aria-hidden="true">←</span></button>
+                    </div>
+                    <div class="home-featured-progress-wrap" aria-hidden="true">
+                        <span id="homeFeaturedPosition">01 / 01</span>
+                        <div class="home-featured-progress"><i id="homeFeaturedProgress"></i></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="video-section">
             <div class="container-custom">
                 <h2 class="video-title">شاهد كيف يعمل K2rty</h2>
@@ -219,6 +243,7 @@
         import { updateCartBadge } from './js/cart.js';
         document.addEventListener('DOMContentLoaded', updateCartBadge);
     </script>
+    <script type="module" src="js/home-products.js"></script>
     <script type="module" src="js/cms.js"></script>
 </body>
 </html>
